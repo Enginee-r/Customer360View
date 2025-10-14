@@ -1,0 +1,310 @@
+{
+  "account": {
+    "description": "Account table transformation from Bronze to Silver",
+    "columns": [
+      {
+        "source_column": "Id",
+        "target_column": "account_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": false
+      },
+      {
+        "source_column": "Name",
+        "target_column": "account_name",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": false
+      },
+      {
+        "source_column": "Type",
+        "target_column": "account_type",
+        "data_type": "string",
+        "transformation": "standardize_account_type",
+        "nullable": true
+      },
+      {
+        "source_column": "BillingCountry",
+        "target_column": "region",
+        "data_type": "string",
+        "transformation": "map_country_to_region",
+        "nullable": true
+      },
+      {
+        "source_column": "AnnualRevenue",
+        "target_column": "annual_revenue_usd",
+        "data_type": "decimal",
+        "transformation": "convert_to_usd",
+        "nullable": true
+      },
+      {
+        "source_column": "CreatedDate",
+        "target_column": "customer_since",
+        "data_type": "date",
+        "transformation": "parse_date",
+        "nullable": false
+      },
+      {
+        "source_column": "Industry",
+        "target_column": "industry",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": true
+      },
+      {
+        "source_column": "NumberOfEmployees",
+        "target_column": "employee_count",
+        "data_type": "integer",
+        "transformation": "null_to_zero",
+        "nullable": true
+      },
+      {
+        "source_column": "Rating",
+        "target_column": "account_rating",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": true
+      },
+      {
+        "source_column": "ParentId",
+        "target_column": "parent_account_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": true
+      }
+    ],
+    "derived_columns": [
+      {
+        "target_column": "risk_score",
+        "data_type": "decimal",
+        "transformation": "calculate_in_gold",
+        "nullable": true
+      },
+      {
+        "target_column": "health_status",
+        "data_type": "string",
+        "transformation": "calculate_in_gold",
+        "nullable": true
+      }
+    ]
+  },
+  "opportunity": {
+    "description": "Opportunity table transformation from Bronze to Silver",
+    "columns": [
+      {
+        "source_column": "Id",
+        "target_column": "opportunity_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": false
+      },
+      {
+        "source_column": "AccountId",
+        "target_column": "account_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": false
+      },
+      {
+        "source_column": "Name",
+        "target_column": "opportunity_name",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": false
+      },
+      {
+        "source_column": "Amount",
+        "target_column": "deal_value",
+        "data_type": "decimal",
+        "transformation": "convert_to_usd",
+        "nullable": true
+      },
+      {
+        "source_column": "StageName",
+        "target_column": "stage",
+        "data_type": "string",
+        "transformation": "standardize_stage",
+        "nullable": false
+      },
+      {
+        "source_column": "CloseDate",
+        "target_column": "close_date",
+        "data_type": "date",
+        "transformation": "parse_date",
+        "nullable": true
+      },
+      {
+        "source_column": "Probability",
+        "target_column": "win_probability",
+        "data_type": "decimal",
+        "transformation": "divide_by_100",
+        "nullable": true
+      },
+      {
+        "source_column": "Type",
+        "target_column": "product_line",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": true
+      },
+      {
+        "source_column": "IsWon",
+        "target_column": "is_won",
+        "data_type": "boolean",
+        "transformation": "to_boolean",
+        "nullable": false
+      },
+      {
+        "source_column": "IsClosed",
+        "target_column": "is_closed",
+        "data_type": "boolean",
+        "transformation": "to_boolean",
+        "nullable": false
+      }
+    ]
+  },
+  "opportunity_line_item": {
+    "description": "Opportunity Line Item transformation from Bronze to Silver",
+    "columns": [
+      {
+        "source_column": "Id",
+        "target_column": "line_item_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": false
+      },
+      {
+        "source_column": "OpportunityId",
+        "target_column": "opportunity_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": false
+      },
+      {
+        "source_column": "Product2Id",
+        "target_column": "product_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": true
+      },
+      {
+        "source_column": "ProductCode",
+        "target_column": "product_name",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": true
+      },
+      {
+        "source_column": "Quantity",
+        "target_column": "quantity",
+        "data_type": "decimal",
+        "transformation": "none",
+        "nullable": true
+      },
+      {
+        "source_column": "UnitPrice",
+        "target_column": "unit_price",
+        "data_type": "decimal",
+        "transformation": "convert_to_usd",
+        "nullable": true
+      },
+      {
+        "source_column": "Discount",
+        "target_column": "discount",
+        "data_type": "decimal",
+        "transformation": "divide_by_100",
+        "nullable": true
+      },
+      {
+        "source_column": "TotalPrice",
+        "target_column": "total_price",
+        "data_type": "decimal",
+        "transformation": "convert_to_usd",
+        "nullable": true
+      }
+    ]
+  },
+  "contact": {
+    "description": "Contact (End User) transformation from Bronze to Silver",
+    "columns": [
+      {
+        "source_column": "Id",
+        "target_column": "contact_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": false
+      },
+      {
+        "source_column": "AccountId",
+        "target_column": "account_id",
+        "data_type": "string",
+        "transformation": "trim_upper",
+        "nullable": false
+      },
+      {
+        "source_column": "FirstName",
+        "target_column": "first_name",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": true
+      },
+      {
+        "source_column": "LastName",
+        "target_column": "last_name",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": false
+      },
+      {
+        "source_column": "Email",
+        "target_column": "email",
+        "data_type": "string",
+        "transformation": "trim_lower",
+        "nullable": true
+      },
+      {
+        "source_column": "Phone",
+        "target_column": "phone",
+        "data_type": "string",
+        "transformation": "standardize_phone",
+        "nullable": true
+      },
+      {
+        "source_column": "Title",
+        "target_column": "role",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": true
+      },
+      {
+        "source_column": "Department",
+        "target_column": "department",
+        "data_type": "string",
+        "transformation": "trim",
+        "nullable": true
+      }
+    ],
+    "derived_columns": [
+      {
+        "target_column": "engagement_score",
+        "data_type": "decimal",
+        "transformation": "calculate_in_gold",
+        "nullable": true
+      }
+    ]
+  },
+  "transformations": {
+    "trim_upper": "Strip whitespace and convert to uppercase",
+    "trim": "Strip leading/trailing whitespace",
+    "trim_lower": "Strip whitespace and convert to lowercase",
+    "standardize_account_type": "Map to: Wholesale, Enterprise, SMB",
+    "map_country_to_region": "Map countries to: Group, South Africa, Kenya, Nigeria, etc.",
+    "convert_to_usd": "Convert currency to USD using exchange rates",
+    "parse_date": "Parse to ISO date format",
+    "null_to_zero": "Replace null with 0",
+    "divide_by_100": "Convert percentage to decimal",
+    "to_boolean": "Convert to true/false",
+    "standardize_stage": "Map to standard stage names",
+    "standardize_phone": "Format phone numbers consistently"
+  }
+}
