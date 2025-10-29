@@ -1,7 +1,7 @@
 # Customer 360 View - Python Dependencies
 
 # Salesforce Integration
-simple-salesforce==1.12.4
+simple-salesforce==1.12.9
 
 # Data Processing
 pandas>=2.2.0
@@ -9,15 +9,15 @@ numpy>=1.26.0
 pyarrow>=14.0.1
 
 # API Framework
-flask==3.0.0
-flask-cors==4.0.0
+flask==3.1.2
+flask-cors==6.0.1
 
 # Utilities
-requests==2.31.0
+requests==2.32.5
 python-dateutil==2.8.2
 
 # LLM/Chatbot
-openai>=1.0.0
+openai>=2.6.0
 
 # Azure Synapse / SQL Server Connectivity
 pyodbc>=5.0.0
