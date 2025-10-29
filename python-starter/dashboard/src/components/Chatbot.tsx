@@ -1,11 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, MessageSquare, Loader2 } from 'lucide-react';
-import { queryChatbot } from '../api/customer360';
+import { queryChatbot, getAllCustomers } from '../api/customer360';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+}
+
+interface Customer {
+  account_id: string;
+  account_name: string;
+  region: string;
+  health_status: string;
 }
 
 interface ChatbotProps {
@@ -24,8 +31,14 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onReset }) =>
   const [messages, setMessages] = useState<Message[]>([initialMessage]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [showMentions, setShowMentions] = useState(false);
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+  const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
+  const [mentionStartPos, setMentionStartPos] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatbotRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -34,6 +47,19 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onReset }) =>
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Fetch all customers on mount
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const customerList = await getAllCustomers();
+        setCustomers(customerList);
+      } catch (error) {
+        console.error('Failed to fetch customers:', error);
+      }
+    };
+    fetchCustomers();
+  }, []);
 
   // Handle click outside to minimize (not reset)
   useEffect(() => {
@@ -57,6 +83,59 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onReset }) =>
     setMessages([initialMessage]);
     setInput('');
     onClose();
+  };
+
+  // Handle input change and detect @ mentions
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    const cursorPos = e.target.selectionStart;
+
+    setInput(value);
+
+    // Find the last @ before cursor position
+    const textBeforeCursor = value.substring(0, cursorPos);
+    const lastAtPos = textBeforeCursor.lastIndexOf('@');
+
+    if (lastAtPos !== -1) {
+      // Check if there's a space or newline after the @
+      const textAfterAt = textBeforeCursor.substring(lastAtPos + 1);
+      const hasSpaceAfter = textAfterAt.includes(' ') || textAfterAt.includes('\n');
+
+      if (!hasSpaceAfter) {
+        // Show mentions dropdown
+        setMentionStartPos(lastAtPos);
+        const query = textAfterAt.toLowerCase();
+
+        const filtered = customers.filter(c =>
+          c.account_name.toLowerCase().includes(query)
+        );
+
+        setFilteredCustomers(filtered);
+        setShowMentions(filtered.length > 0);
+        setSelectedMentionIndex(0);
+      } else {
+        setShowMentions(false);
+      }
+    } else {
+      setShowMentions(false);
+    }
+  };
+
+  // Handle customer selection from dropdown
+  const selectCustomer = (customer: Customer) => {
+    if (mentionStartPos === null) return;
+
+    const beforeMention = input.substring(0, mentionStartPos);
+    const afterMention = input.substring(textareaRef.current?.selectionStart || input.length);
+
+    setInput(`${beforeMention}@${customer.account_name} ${afterMention}`);
+    setShowMentions(false);
+    setMentionStartPos(null);
+
+    // Focus back on textarea
+    setTimeout(() => {
+      textareaRef.current?.focus();
+    }, 0);
   };
 
   const handleSend = async () => {
@@ -102,6 +181,35 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onReset }) =>
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Handle mention dropdown navigation
+    if (showMentions) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedMentionIndex(prev =>
+          prev < filteredCustomers.length - 1 ? prev + 1 : prev
+        );
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedMentionIndex(prev => (prev > 0 ? prev - 1 : 0));
+        return;
+      }
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (filteredCustomers[selectedMentionIndex]) {
+          selectCustomer(filteredCustomers[selectedMentionIndex]);
+        }
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowMentions(false);
+        return;
+      }
+    }
+
+    // Normal send on Enter
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -170,13 +278,56 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onReset }) =>
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200 dark:border-datacamp-dark-bg-secondary">
+      <div className="p-4 border-t border-gray-200 dark:border-datacamp-dark-bg-secondary relative">
+        {/* Mentions Dropdown */}
+        {showMentions && filteredCustomers.length > 0 && (
+          <div className="absolute bottom-full left-4 right-4 mb-2 max-h-60 overflow-y-auto bg-white dark:bg-datacamp-dark-bg-secondary rounded-lg shadow-lg border border-gray-200 dark:border-datacamp-dark-bg-contrast">
+            <div className="p-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-datacamp-dark-bg-contrast">
+              Select a customer (↑↓ to navigate, Enter to select)
+            </div>
+            {filteredCustomers.map((customer, index) => (
+              <div
+                key={customer.account_id}
+                onClick={() => selectCustomer(customer)}
+                className={`px-3 py-2 cursor-pointer transition-colors ${
+                  index === selectedMentionIndex
+                    ? 'bg-datacamp-brand/10 dark:bg-datacamp-brand/20'
+                    : 'hover:bg-gray-100 dark:hover:bg-datacamp-dark-bg-main'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+                      {customer.account_name}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {customer.region}
+                    </div>
+                  </div>
+                  <span
+                    className={`text-xs px-2 py-1 rounded ${
+                      customer.health_status === 'Healthy'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                        : customer.health_status === 'At-Risk'
+                        ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                    }`}
+                  >
+                    {customer.health_status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="flex gap-2">
           <textarea
+            ref={textareaRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about customers, revenue, health scores..."
+            placeholder="Ask about customers, revenue, health scores... (Type @ to mention a customer)"
             className="flex-1 resize-none rounded-lg border border-gray-300 dark:border-datacamp-dark-bg-secondary bg-white dark:bg-datacamp-dark-bg-main px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-datacamp-brand text-datacamp-text-primary dark:text-datacamp-dark-text-primary placeholder-gray-400 dark:placeholder-gray-500"
             rows={2}
             disabled={isLoading}

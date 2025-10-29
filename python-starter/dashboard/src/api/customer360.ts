@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -68,5 +68,10 @@ export const getSegmentRecommendations = async (filterType: 'health' | 'region',
 
 export const queryChatbot = async (query: string, history: any[]) => {
   const response = await api.post('/chatbot/query', { query, history });
+  return response.data;
+};
+
+export const getAllCustomers = async () => {
+  const response = await api.get('/customers');
   return response.data;
 };

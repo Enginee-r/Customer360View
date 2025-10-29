@@ -19,6 +19,10 @@ python-dateutil==2.8.2
 # LLM/Chatbot
 openai>=1.0.0
 
+# Azure Synapse / SQL Server Connectivity
+pyodbc>=5.0.0
+sqlalchemy>=2.0.0
+
 # Development
 python-dotenv==1.0.0
 pytest
