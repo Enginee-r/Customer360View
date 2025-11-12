@@ -7,6 +7,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pathlib import Path
 import pandas as pd
+import numpy as np
 from datetime import datetime
 import logging
 import os
@@ -90,8 +91,18 @@ def search_customers():
     else:
         filtered = customers  # Return all customers if no query
 
-    # Convert to dict
-    results = filtered[['account_id', 'account_name', 'region', 'health_status']].to_dict('records')
+    # Convert to dict with all columns
+    results = filtered.to_dict('records')
+
+    # Clean up NaN values and convert timestamps
+    for customer in results:
+        for key, value in list(customer.items()):
+            if pd.api.types.is_datetime64_any_dtype(type(value)) or isinstance(value, (pd.Timestamp, datetime)):
+                customer[key] = value.isoformat() if not pd.isna(value) else None
+            elif isinstance(value, (np.integer, np.floating)):
+                customer[key] = None if pd.isna(value) else float(value)
+            elif pd.isna(value):
+                customer[key] = None
 
     return jsonify(results)
 
@@ -111,10 +122,12 @@ def get_customer_360(account_id: str):
 
     customer_data = customer.iloc[0].to_dict()
 
-    # Convert timestamps to ISO format
-    for key, value in customer_data.items():
-        if pd.api.types.is_datetime64_any_dtype(type(value)):
-            customer_data[key] = value.isoformat()
+    # Clean up NaN values and convert timestamps
+    for key, value in list(customer_data.items()):
+        if pd.api.types.is_datetime64_any_dtype(type(value)) or isinstance(value, (pd.Timestamp, datetime)):
+            customer_data[key] = value.isoformat() if not pd.isna(value) else None
+        elif isinstance(value, (np.integer, np.floating)):
+            customer_data[key] = None if pd.isna(value) else float(value)
         elif pd.isna(value):
             customer_data[key] = None
 
