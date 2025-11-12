@@ -1,0 +1,141 @@
+{
+  "cassava_group": {
+    "name": "Cassava Technologies",
+    "description": "Pan-African technology group",
+    "logo": "https://www.cassavatechnologies.com/wp-content/uploads/2022/06/Cassava-Logo.png",
+    "website": "https://www.cassavatechnologies.com"
+  },
+  "subsidiaries": [
+    {
+      "id": "liquid_tech",
+      "name": "Liquid Intelligent Technologies",
+      "short_name": "Liquid Tech",
+      "description": "Pan-African technology group - Africa's digital future",
+      "logo": "https://liquid.tech/assets/images/logo.svg",
+      "website": "https://liquid.tech/",
+      "color": "#00A9E0",
+      "countries": [
+        "South Africa", "Kenya", "Nigeria", "Ghana", "Uganda", "Tanzania",
+        "Zambia", "Zimbabwe", "Botswana", "Rwanda", "DRC", "Lesotho",
+        "Mozambique", "Malawi"
+      ],
+      "services": [
+        "Internet Connectivity",
+        "Cloud Services (Microsoft 365, Azure)",
+        "Cybersecurity Solutions",
+        "SD-WAN",
+        "Unified Communications",
+        "Managed IT Services",
+        "Network Solutions",
+        "Fibre Connectivity",
+        "Enterprise Networking",
+        "IoT Solutions",
+        "International Wholesale Services"
+      ]
+    },
+    {
+      "id": "liquid_c2",
+      "name": "Liquid C2",
+      "short_name": "Liquid C2",
+      "description": "Enterprise cloud and cybersecurity services",
+      "logo": "https://liquidc2.com/assets/logo.svg",
+      "website": "https://liquidc2.com/",
+      "color": "#0066CC",
+      "countries": [
+        "South Africa", "Kenya", "Nigeria", "Ghana", "Uganda",
+        "Zambia", "Zimbabwe", "Botswana", "Rwanda", "Tanzania"
+      ],
+      "services": [
+        "Cloud Migration",
+        "Cloud Management",
+        "Cybersecurity Solutions",
+        "Security Operations Center (SOC)",
+        "Threat Intelligence",
+        "Vulnerability Management",
+        "Security Consulting",
+        "Compliance Services",
+        "Identity & Access Management",
+        "Cloud Security"
+      ]
+    },
+    {
+      "id": "cassava_ai",
+      "name": "Cassava AI",
+      "short_name": "Cassava AI",
+      "description": "AI and Machine Learning for African businesses",
+      "logo": "https://www.cassava.ai/logo.svg",
+      "website": "https://www.cassava.ai/",
+      "color": "#7B3FF2",
+      "countries": [
+        "South Africa", "Kenya", "Nigeria", "Ghana", "Rwanda",
+        "Zambia", "Zimbabwe", "Uganda", "Tanzania"
+      ],
+      "services": [
+        "AI Consulting",
+        "Machine Learning Solutions",
+        "Data Analytics",
+        "Predictive Analytics",
+        "Natural Language Processing",
+        "Computer Vision",
+        "AI-Powered Automation",
+        "Custom AI Models",
+        "AI Integration",
+        "AI Training & Support"
+      ]
+    },
+    {
+      "id": "africa_data_centres",
+      "name": "Africa Data Centres",
+      "short_name": "ADC",
+      "description": "Purpose-built carrier-neutral data centers",
+      "logo": "https://www.africadatacentres.com/logo.svg",
+      "website": "https://www.africadatacentres.com/",
+      "color": "#FF6B35",
+      "countries": [
+        "South Africa", "Kenya", "Nigeria"
+      ],
+      "facilities": [
+        "JHB1 Midrand", "JHB2 Samrand", "CPT1 Cape Town",
+        "NBO1 Nairobi", "LOS1 Lagos"
+      ],
+      "services": [
+        "Colocation Services",
+        "Cloud Services",
+        "Network Services",
+        "Disaster Recovery",
+        "Business Continuity",
+        "Power & Cooling",
+        "Physical Security (ISO 27001)",
+        "Remote Hands Services",
+        "Rack Space",
+        "Private Suites",
+        "Carrier-Neutral Connectivity"
+      ]
+    },
+    {
+      "id": "sasai_fintech",
+      "name": "Sasai Fintech",
+      "short_name": "Sasai",
+      "description": "Digital financial services and super app",
+      "logo": "https://sasaifintech.com/logo.svg",
+      "website": "https://sasaifintech.com/",
+      "color": "#00D4AA",
+      "countries": [
+        "Zimbabwe", "South Africa", "Zambia", "Botswana",
+        "Mozambique", "Lesotho"
+      ],
+      "services": [
+        "Mobile Payments",
+        "Digital Wallet",
+        "Money Transfers",
+        "Bill Payments",
+        "Merchant Services",
+        "E-commerce Solutions",
+        "Airtime & Data Top-up",
+        "Payment Gateway",
+        "Financial Inclusion",
+        "Super App Platform"
+      ]
+    }
+  ]
+}

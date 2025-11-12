@@ -1,0 +1,61 @@
+# Customer 360 View - Git Ignore
+
+# Salesforce Credentials - NEVER COMMIT
+config/salesforce_config.json
+
+# Data Directories - Too large for git
+data/
+*.parquet
+*.csv
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Node / Dashboard
+node_modules/
+dashboard/node_modules/
+dashboard/dist/
+dashboard/build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment Variables
+*.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+api/app.log
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+
+# OS Files
+Thumbs.db
+.DS_Store

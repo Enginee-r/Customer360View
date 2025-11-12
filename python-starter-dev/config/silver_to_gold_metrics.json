@@ -1,0 +1,276 @@
+{
+  "customer_360_metrics": {
+    "description": "Core Customer 360 KPIs and metrics",
+    "metrics": [
+      {
+        "name": "customer_lifetime_value",
+        "alias": "CLV",
+        "calculation": "SUM(historical_revenue) + SUM(projected_future_revenue)",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "monthly_recurring_revenue",
+        "alias": "MRR",
+        "calculation": "SUM(active_subscription_revenue) / 12",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "annual_revenue",
+        "alias": "ARR",
+        "calculation": "SUM(closed_won_opportunities.amount) WHERE close_date >= current_year",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "yoy_growth",
+        "alias": "YoY_Growth",
+        "calculation": "(current_year_revenue - previous_year_revenue) / previous_year_revenue * 100",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "active_services",
+        "alias": "Active_Services",
+        "calculation": "COUNT(DISTINCT product_id) WHERE status = 'Active'",
+        "data_type": "integer",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "support_tickets",
+        "alias": "Open_Tickets",
+        "calculation": "COUNT(tickets) WHERE status != 'Closed'",
+        "data_type": "integer",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "avg_response_time",
+        "alias": "Response_Time",
+        "calculation": "AVG(first_response_time_hours)",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "sla_compliance_rate",
+        "alias": "SLA_Compliance",
+        "calculation": "COUNT(tickets_within_sla) / COUNT(total_tickets) * 100",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      }
+    ]
+  },
+  "risk_metrics": {
+    "description": "Risk and health scoring metrics",
+    "metrics": [
+      {
+        "name": "churn_risk_score",
+        "calculation": "weighted_combination(usage_trend, payment_history, support_issues, engagement)",
+        "weights": {
+          "usage_trend": 0.3,
+          "payment_history": 0.3,
+          "support_issues": 0.25,
+          "engagement": 0.15
+        },
+        "data_type": "decimal",
+        "range": "0-100",
+        "thresholds": {
+          "high": 70,
+          "medium": 40,
+          "low": 0
+        }
+      },
+      {
+        "name": "health_score",
+        "calculation": "weighted_combination(payment_history, support_tickets, usage_trends, engagement)",
+        "weights": {
+          "payment_history": 0.3,
+          "support_tickets": 0.25,
+          "usage_trends": 0.25,
+          "engagement": 0.2
+        },
+        "data_type": "decimal",
+        "range": "0-100",
+        "categories": {
+          "healthy": "80-100",
+          "at_risk": "50-79",
+          "critical": "0-49"
+        }
+      },
+      {
+        "name": "payment_risk_score",
+        "calculation": "days_overdue * 2 + (overdue_amount / credit_limit * 50)",
+        "data_type": "decimal",
+        "range": "0-100"
+      }
+    ]
+  },
+  "business_metrics": {
+    "description": "Business performance indicators",
+    "metrics": [
+      {
+        "name": "win_rate",
+        "calculation": "COUNT(won_opportunities) / COUNT(total_opportunities) * 100",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "average_deal_size",
+        "calculation": "AVG(opportunity.amount) WHERE is_won = true",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "sales_cycle_length",
+        "calculation": "AVG(DATEDIFF(close_date, created_date))",
+        "data_type": "integer",
+        "aggregation_level": "account"
+      },
+      {
+        "name": "contract_renewal_rate",
+        "calculation": "COUNT(renewed_contracts) / COUNT(expiring_contracts) * 100",
+        "data_type": "decimal",
+        "aggregation_level": "account"
+      }
+    ]
+  },
+  "alert_triggers": {
+    "description": "Conditions that trigger risk alerts",
+    "rules": [
+      {
+        "alert_type": "churn_risk",
+        "condition": "churn_risk_score > 70",
+        "severity": "HIGH",
+        "message": "Customer showing high churn risk indicators"
+      },
+      {
+        "alert_type": "sla_breach",
+        "condition": "sla_compliance_rate < 90",
+        "severity": "HIGH",
+        "message": "SLA compliance below acceptable threshold"
+      },
+      {
+        "alert_type": "payment_overdue",
+        "condition": "days_overdue > 15",
+        "severity": "MEDIUM",
+        "message": "Payment overdue for more than 15 days"
+      },
+      {
+        "alert_type": "usage_decline",
+        "condition": "usage_change_90d < -30",
+        "severity": "MEDIUM",
+        "message": "Usage declined by more than 30% in last 90 days"
+      },
+      {
+        "alert_type": "contract_expiring",
+        "condition": "days_until_contract_expiry < 90",
+        "severity": "MEDIUM",
+        "message": "Contract expiring within 90 days"
+      },
+      {
+        "alert_type": "support_escalation",
+        "condition": "escalated_tickets > 0",
+        "severity": "HIGH",
+        "message": "Active escalated support tickets require attention"
+      }
+    ]
+  },
+  "recommendation_rules": {
+    "description": "Rules for generating next-best-action recommendations",
+    "rules": [
+      {
+        "rule_id": "R001",
+        "name": "High Churn Risk + Contract Expiring",
+        "conditions": [
+          "churn_risk_score > 70",
+          "days_until_contract_expiry < 90"
+        ],
+        "action": {
+          "priority": "HIGH",
+          "category": "Retention",
+          "title": "Schedule Urgent Retention Call",
+          "description": "Customer shows high churn risk with approaching contract expiry. Immediate executive intervention required.",
+          "expected_outcome": "Retain customer and renew contract",
+          "estimated_impact_revenue": "annual_revenue * 1.0"
+        }
+      },
+      {
+        "rule_id": "R002",
+        "name": "Usage Spike + Limited Services",
+        "conditions": [
+          "usage_change_90d > 50",
+          "active_services < 5"
+        ],
+        "action": {
+          "priority": "MEDIUM",
+          "category": "Growth",
+          "title": "Propose Service Upgrade",
+          "description": "Customer usage is growing rapidly. Opportunity to upsell additional services.",
+          "expected_outcome": "Increase service adoption",
+          "estimated_impact_revenue": "monthly_revenue * 0.3 * 12"
+        }
+      },
+      {
+        "rule_id": "R003",
+        "name": "Payment Overdue",
+        "conditions": [
+          "days_overdue > 15"
+        ],
+        "action": {
+          "priority": "MEDIUM",
+          "category": "Billing",
+          "title": "Send Payment Reminder",
+          "description": "Outstanding invoice requires follow-up to maintain healthy payment relationship.",
+          "expected_outcome": "Collect overdue payment",
+          "estimated_impact_revenue": "overdue_amount"
+        }
+      },
+      {
+        "rule_id": "R004",
+        "name": "SLA Breach Detected",
+        "conditions": [
+          "sla_breaches > 0"
+        ],
+        "action": {
+          "priority": "HIGH",
+          "category": "Support",
+          "title": "Technical Review Meeting",
+          "description": "Recent SLA breaches require immediate technical review and remediation plan.",
+          "expected_outcome": "Restore service quality and customer confidence",
+          "estimated_impact_revenue": "0"
+        }
+      },
+      {
+        "rule_id": "R005",
+        "name": "Strong Revenue Growth",
+        "conditions": [
+          "yoy_growth > 20"
+        ],
+        "action": {
+          "priority": "LOW",
+          "category": "Growth",
+          "title": "Executive Relationship Building",
+          "description": "Customer showing strong growth. Opportunity to strengthen executive relationships.",
+          "expected_outcome": "Deepen partnership and identify expansion opportunities",
+          "estimated_impact_revenue": "annual_revenue * 0.15"
+        }
+      },
+      {
+        "rule_id": "R006",
+        "name": "Low Engagement",
+        "conditions": [
+          "engagement_score < 30",
+          "churn_risk_score < 70"
+        ],
+        "action": {
+          "priority": "MEDIUM",
+          "category": "Retention",
+          "title": "Schedule Quarterly Business Review",
+          "description": "Customer engagement is declining. QBR needed to re-align on business value.",
+          "expected_outcome": "Increase engagement and satisfaction",
+          "estimated_impact_revenue": "0"
+        }
+      }
+    ]
+  }
+}
