@@ -34,8 +34,8 @@ export default function CustomerListItem({ customer, onClick, showRevenue = fals
   const [subsidiaryConfig, setSubsidiaryConfig] = useState<Record<string, SubsidiaryConfig>>({});
 
   useEffect(() => {
-    const apiUrl = 'http://localhost:5001';
-    fetch(`${apiUrl}/api/subsidiaries`)
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    fetch(`${apiUrl}/subsidiaries`)
       .then(res => res.json())
       .then(data => {
         const config: Record<string, SubsidiaryConfig> = {};

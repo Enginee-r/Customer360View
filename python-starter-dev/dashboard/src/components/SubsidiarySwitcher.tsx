@@ -24,8 +24,8 @@ export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidi
 
   useEffect(() => {
     // Fetch subsidiaries list
-    const apiUrl = 'http://localhost:5001';
-    fetch(`${apiUrl}/api/subsidiaries`)
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    fetch(`${apiUrl}/subsidiaries`)
       .then(res => res.json())
       .then(data => {
         setSubsidiaries(data.subsidiaries || []);
@@ -36,8 +36,8 @@ export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidi
   useEffect(() => {
     // Fetch stats for selected subsidiary
     if (selectedSubsidiary) {
-      const apiUrl = 'http://localhost:5001';
-      fetch(`${apiUrl}/api/subsidiary/${selectedSubsidiary}/stats`)
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+      fetch(`${apiUrl}/subsidiary/${selectedSubsidiary}/stats`)
         .then(res => res.json())
         .then(data => {
           setStats(prev => ({ ...prev, [selectedSubsidiary]: data }));

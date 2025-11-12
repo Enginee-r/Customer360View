@@ -75,8 +75,8 @@ function GroupDashboard({ onSelectCustomer }: { onSelectCustomer: (customerId: s
   };
 
   const { data: dashboardData } = useQuery('dashboard-summary', async () => {
-    const apiUrl = 'http://localhost:5001';
-    const response = await fetch(`${apiUrl}/api/dashboard/summary`);
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    const response = await fetch(`${apiUrl}/dashboard/summary`);
     return response.json();
   });
 

@@ -67,8 +67,8 @@ export default function SubsidiaryDashboard({ subsidiaryId, onSelectCustomer }: 
 
   // Fetch subsidiary information
   useEffect(() => {
-    const apiUrl = 'http://localhost:5001';
-    fetch(`${apiUrl}/api/subsidiaries`)
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    fetch(`${apiUrl}/subsidiaries`)
       .then(res => res.json())
       .then(data => {
         const sub = data.subsidiaries?.find((s: SubsidiaryInfo) => s.id === subsidiaryId);
@@ -83,8 +83,8 @@ export default function SubsidiaryDashboard({ subsidiaryId, onSelectCustomer }: 
   const { data: dashboardData, isLoading } = useQuery<DashboardData>(
     ['subsidiary-dashboard', subsidiaryId],
     async () => {
-      const apiUrl = 'http://localhost:5001';
-      const response = await fetch(`${apiUrl}/api/subsidiary/${subsidiaryId}/dashboard`);
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+      const response = await fetch(`${apiUrl}/subsidiary/${subsidiaryId}/dashboard`);
       return response.json();
     },
     {

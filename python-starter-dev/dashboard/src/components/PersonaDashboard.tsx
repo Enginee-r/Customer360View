@@ -57,7 +57,10 @@ export default function PersonaDashboard({ customerId }: PersonaDashboardProps) 
 
   const { data: subsidiaryConfig } = useQuery(
     ['subsidiaries'],
-    () => fetch('http://localhost:5001/api/subsidiaries').then(res => res.json())
+    () => {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+      return fetch(`${apiUrl}/subsidiaries`).then(res => res.json());
+    }
   );
 
   const executeMutation = useMutation(executeAction, {

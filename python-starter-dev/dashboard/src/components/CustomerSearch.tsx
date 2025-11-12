@@ -46,11 +46,11 @@ export default function CustomerSearch({ onSelectCustomer, subsidiaryFilter }: C
   const { data: customers, isLoading } = useQuery(
     ['customers', searchQuery, subsidiaryFilter],
     async () => {
-      const apiUrl = 'http://localhost:5001';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
       // If subsidiary filter is active, fetch from subsidiary endpoint
       if (subsidiaryFilter) {
-        const response = await fetch(`${apiUrl}/api/subsidiary/${subsidiaryFilter}/customers`);
+        const response = await fetch(`${apiUrl}/subsidiary/${subsidiaryFilter}/customers`);
         const allCustomers = await response.json();
 
         // Filter by search query if provided
