@@ -65,7 +65,7 @@ export default function CustomerDashboard({ customerId }: CustomerDashboardProps
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimation: 0,
+      minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
   };
