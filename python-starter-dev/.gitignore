@@ -3,9 +3,9 @@
 # Salesforce Credentials - NEVER COMMIT
 config/salesforce_config.json
 
-# Data Directories - Too large for git
-data/
-*.parquet
+# Data Directories - Include sample data for deployment
+# data/ - Commented out to include dummy data for demo
+# *.parquet - Commented out to include dummy data for demo
 *.csv
 
 # Python
