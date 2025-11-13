@@ -575,10 +575,10 @@ def get_dashboard_summary():
         customers[customers['health_status'] == 'Critical'].head(10)
     )
 
-    # Get customers by region
+    # Get customers by region (sorted by revenue - top revenue customers)
     region_samples = {}
     for region in customers['region'].unique():
-        region_customers = customers[customers['region'] == region].head(5)
+        region_customers = customers[customers['region'] == region].nlargest(5, 'annual_revenue')
         region_samples[region] = add_subsidiary_info(region_customers)
 
     # Customer satisfaction metrics
@@ -1147,10 +1147,10 @@ def get_opco_dashboard(opco_id: str):
         opco_customers[opco_customers['health_status'] == 'Critical'].head(10)
     )
 
-    # Get customers by region
+    # Get customers by region (sorted by revenue - top revenue customers)
     region_samples = {}
     for region in opco_customers['region'].unique():
-        region_customers = opco_customers[opco_customers['region'] == region].head(5)
+        region_customers = opco_customers[opco_customers['region'] == region].nlargest(5, 'annual_revenue')
         region_samples[region] = add_subsidiary_info(region_customers)
 
     # Customer satisfaction metrics

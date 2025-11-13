@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
-import { Moon, Sun, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
+import { Moon, Sun, ChevronDown, ChevronUp, MessageSquare, X } from 'lucide-react';
 import CustomerSearch from './components/CustomerSearch';
 import PersonaDashboard from './components/PersonaDashboard';
 import MetricDrillDown from './components/MetricDrillDown';
@@ -347,14 +347,30 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
                   </div>
                 </div>
                 {expandedHealthStatus === 'Healthy' && dashboardData.healthy_customers_sample && (
-                  <div className="mt-3 pt-3 border-t border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary space-y-1">
-                    {dashboardData.healthy_customers_sample.slice(0, 5).map((customer: any) => (
-                      <CustomerListItem
-                        key={customer.account_id}
-                        customer={customer}
-                        onClick={() => onSelectCustomer(customer.account_id)}
-                      />
-                    ))}
+                  <div className="mt-3 pt-3 border-t border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+                        Healthy Customers
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedHealthStatus(null);
+                        }}
+                        className="text-datacamp-text-subtle hover:text-datacamp-text-primary dark:text-datacamp-dark-text-subtle dark:hover:text-datacamp-dark-text-primary transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {dashboardData.healthy_customers_sample.slice(0, 5).map((customer: any) => (
+                        <CustomerListItem
+                          key={customer.account_id}
+                          customer={customer}
+                          onClick={() => onSelectCustomer(customer.account_id)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -384,14 +400,30 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
                   </div>
                 </div>
                 {expandedHealthStatus === 'At-Risk' && dashboardData.at_risk_customers_sample && (
-                  <div className="mt-3 pt-3 border-t border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary space-y-1">
-                    {dashboardData.at_risk_customers_sample.slice(0, 5).map((customer: any) => (
-                      <CustomerListItem
-                        key={customer.account_id}
-                        customer={customer}
-                        onClick={() => onSelectCustomer(customer.account_id)}
-                      />
-                    ))}
+                  <div className="mt-3 pt-3 border-t border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+                        At-Risk Customers
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedHealthStatus(null);
+                        }}
+                        className="text-datacamp-text-subtle hover:text-datacamp-text-primary dark:text-datacamp-dark-text-subtle dark:hover:text-datacamp-dark-text-primary transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {dashboardData.at_risk_customers_sample.slice(0, 5).map((customer: any) => (
+                        <CustomerListItem
+                          key={customer.account_id}
+                          customer={customer}
+                          onClick={() => onSelectCustomer(customer.account_id)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -421,14 +453,30 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
                   </div>
                 </div>
                 {expandedHealthStatus === 'Critical' && dashboardData.critical_customers_sample && (
-                  <div className="mt-3 pt-3 border-t border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary space-y-1">
-                    {dashboardData.critical_customers_sample.slice(0, 5).map((customer: any) => (
-                      <CustomerListItem
-                        key={customer.account_id}
-                        customer={customer}
-                        onClick={() => onSelectCustomer(customer.account_id)}
-                      />
-                    ))}
+                  <div className="mt-3 pt-3 border-t border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+                        Critical Customers
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedHealthStatus(null);
+                        }}
+                        className="text-datacamp-text-subtle hover:text-datacamp-text-primary dark:text-datacamp-dark-text-subtle dark:hover:text-datacamp-dark-text-primary transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {dashboardData.critical_customers_sample.slice(0, 5).map((customer: any) => (
+                        <CustomerListItem
+                          key={customer.account_id}
+                          customer={customer}
+                          onClick={() => onSelectCustomer(customer.account_id)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -458,14 +506,31 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
                     <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">{count}</span>
                   </div>
                   {expandedRegion === region && dashboardData.region_samples?.[region] && (
-                    <div className="mt-3 pt-3 border-t border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary space-y-1">
-                      {dashboardData.region_samples[region].slice(0, 3).map((customer: any) => (
-                        <CustomerListItem
-                          key={customer.account_id}
-                          customer={customer}
-                          onClick={() => onSelectCustomer(customer.account_id)}
-                        />
-                      ))}
+                    <div className="mt-3 pt-3 border-t border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+                          {region} Customers
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedRegion(null);
+                          }}
+                          className="text-datacamp-text-subtle hover:text-datacamp-text-primary dark:text-datacamp-dark-text-subtle dark:hover:text-datacamp-dark-text-primary transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {dashboardData.region_samples[region].slice(0, 3).map((customer: any) => (
+                          <CustomerListItem
+                            key={customer.account_id}
+                            customer={customer}
+                            onClick={() => onSelectCustomer(customer.account_id)}
+                            showRevenue={true}
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
