@@ -128,7 +128,8 @@ class FabricDataLoader:
             logger.warning(f"No local files found matching: {pattern}")
             return pd.DataFrame()
 
-        latest_file = max(files, key=lambda x: x.stat().st_mtime)
+        # Sort by filename (contains timestamp) for consistent behavior across deployments
+        latest_file = max(files, key=lambda x: x.name)
         logger.info(f"Loading from local file: {latest_file.name}")
 
         try:

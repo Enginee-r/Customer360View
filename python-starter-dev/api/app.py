@@ -89,7 +89,9 @@ class DataLoader:
             logger.warning(f"No gold files found for {table_name}")
             return pd.DataFrame()
 
-        latest_file = max(files, key=lambda x: x.stat().st_mtime)
+        # Sort by filename (contains timestamp) instead of file modification time
+        # This ensures consistent behavior across deployments where all files get same mtime
+        latest_file = max(files, key=lambda x: x.name)
         logger.info(f"Loading: {latest_file}")
 
         df = pd.read_parquet(latest_file)
