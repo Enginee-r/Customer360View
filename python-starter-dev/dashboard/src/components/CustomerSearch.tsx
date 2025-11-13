@@ -36,10 +36,11 @@ export default function CustomerSearch({ onSelectCustomer, opCoFilter, subsidiar
   useEffect(() => {
     if (showResults && searchRef.current) {
       const rect = searchRef.current.getBoundingClientRect();
+      const isMobile = window.innerWidth < 768;
       setDropdownPosition({
         top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
-        width: rect.width,
+        left: isMobile ? 8 : rect.left + window.scrollX,
+        width: isMobile ? window.innerWidth - 16 : rect.width,
       });
     }
   }, [showResults]);
@@ -101,7 +102,7 @@ export default function CustomerSearch({ onSelectCustomer, opCoFilter, subsidiar
       className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary shadow-xl rounded-lg border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary overflow-y-auto"
       style={{
         position: 'fixed',
-        top: `${dropdownPosition.top + 8}px`,
+        top: `${dropdownPosition.top + 4}px`,
         left: `${dropdownPosition.left}px`,
         width: `${dropdownPosition.width}px`,
         maxHeight: '15rem',
@@ -109,13 +110,13 @@ export default function CustomerSearch({ onSelectCustomer, opCoFilter, subsidiar
       }}
     >
           {isLoading && (
-            <div className="px-4 py-3 text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
+            <div className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
               Loading customers...
             </div>
           )}
 
           {!isLoading && customers && customers.length === 0 && (
-            <div className="px-4 py-3 text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
+            <div className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
               {searchQuery.length >= 2 ? 'No customers found' : 'No customers available'}
             </div>
           )}
@@ -125,12 +126,12 @@ export default function CustomerSearch({ onSelectCustomer, opCoFilter, subsidiar
               {customers.map((customer: any) => (
                 <li
                   key={customer.account_id}
-                  className="px-4 py-3 cursor-pointer transition-colors hover:bg-datacamp-bg-secondary dark:hover:bg-datacamp-dark-bg-contrast"
+                  className="px-3 sm:px-4 py-2 sm:py-3 cursor-pointer transition-colors hover:bg-datacamp-bg-secondary dark:hover:bg-datacamp-dark-bg-contrast"
                   onClick={() => handleSelect(customer.account_id)}
                 >
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center justify-between gap-2 sm:gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary truncate">
+                      <p className="text-xs sm:text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary truncate">
                         {customer.account_name}
                       </p>
                       <p className="text-xs text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle mt-0.5">
@@ -138,7 +139,7 @@ export default function CustomerSearch({ onSelectCustomer, opCoFilter, subsidiar
                       </p>
                     </div>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
+                      className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
                         customer.health_status === 'Healthy'
                           ? 'bg-datacamp-success/10 text-datacamp-success border border-datacamp-success/20'
                           : customer.health_status === 'At-Risk'
@@ -158,14 +159,14 @@ export default function CustomerSearch({ onSelectCustomer, opCoFilter, subsidiar
 
   return (
     <>
-      <div ref={searchRef} className="relative z-50">
+      <div ref={searchRef} className="relative">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle" />
+          <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle" />
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary rounded-lg leading-5 bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary placeholder-datacamp-text-subtle dark:placeholder-datacamp-dark-text-subtle text-datacamp-text-primary dark:text-datacamp-dark-text-primary focus:outline-none focus:ring-2 focus:ring-datacamp-brand focus:border-datacamp-brand text-sm transition-colors relative z-10"
+            className="block w-full pl-7 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary rounded-lg leading-5 bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary placeholder-datacamp-text-subtle dark:placeholder-datacamp-dark-text-subtle text-datacamp-text-primary dark:text-datacamp-dark-text-primary focus:outline-none focus:ring-2 focus:ring-datacamp-brand focus:border-datacamp-brand text-xs sm:text-sm transition-colors"
             placeholder="Search customers..."
             value={searchQuery}
             onChange={(e) => {
