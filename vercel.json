@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "buildCommand": "cd python-starter-dev/dashboard && npm run build",
+  "outputDirectory": "python-starter-dev/dashboard/dist",
+  "installCommand": "cd python-starter-dev/dashboard && npm install",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://customer360-api-dev.onrender.com/api"
+  }
+}
