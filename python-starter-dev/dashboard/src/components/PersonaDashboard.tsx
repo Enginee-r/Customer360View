@@ -859,16 +859,16 @@ export default function PersonaDashboard({ customerId }: PersonaDashboardProps) 
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {/* Customer Header */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex items-center justify-between">
+      <div className="bg-white shadow rounded-lg p-3 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{customer.account_name}</h2>
-            <div className="mt-2 flex items-center space-x-4">
-              <span className="text-sm text-gray-500">{customer.region}</span>
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-900">{customer.account_name}</h2>
+            <div className="mt-2 flex items-center flex-wrap gap-2 sm:space-x-4">
+              <span className="text-xs sm:text-sm text-gray-500">{customer.region}</span>
               <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${
                   customer.health_status === 'Healthy'
                     ? 'bg-green-100 text-green-800'
                     : customer.health_status === 'At-Risk'
@@ -880,28 +880,28 @@ export default function PersonaDashboard({ customerId }: PersonaDashboardProps) 
               </span>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-3xl font-bold text-gray-900">{formatCurrency(customer.annual_revenue)}</p>
-            <p className="text-sm text-gray-500 mt-1">Annual Revenue</p>
+          <div className="text-left sm:text-right">
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900">{formatCurrency(customer.annual_revenue)}</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Annual Revenue</p>
           </div>
         </div>
       </div>
 
       {/* Persona Selector */}
-      <div className="bg-white shadow rounded-lg p-4">
-        <div className="flex flex-wrap gap-2">
+      <div className="bg-white shadow rounded-lg p-2 sm:p-4">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {personas.map((persona) => (
             <button
               key={persona.id}
               onClick={() => setSelectedPersona(persona.id as PersonaView)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors ${
                 selectedPersona === persona.id
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <persona.icon className="h-4 w-4" />
-              <span className="text-sm font-medium">{persona.name}</span>
+              <persona.icon className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm font-medium">{persona.name}</span>
             </button>
           ))}
         </div>
@@ -927,25 +927,25 @@ export default function PersonaDashboard({ customerId }: PersonaDashboardProps) 
 
       {/* Alerts Section */}
       {filteredAlerts && filteredAlerts.length > 0 && (
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex items-center mb-4">
-            <Bell className="h-5 w-5 text-red-600 mr-2" />
-            <h3 className="text-lg font-bold text-gray-900">Active Alerts ({filteredAlerts.length})</h3>
+        <div className="bg-white shadow rounded-lg p-3 sm:p-6">
+          <div className="flex items-center mb-3 sm:mb-4">
+            <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 mr-2" />
+            <h3 className="text-base sm:text-lg font-bold text-gray-900">Active Alerts ({filteredAlerts.length})</h3>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {filteredAlerts.map((alert: any) => (
               <div
                 key={alert.alert_id}
-                className={`border-l-4 p-4 rounded ${
+                className={`border-l-4 p-2 sm:p-4 rounded ${
                   alert.severity === 'HIGH' ? 'bg-red-50 border-red-500' :
                   alert.severity === 'MEDIUM' ? 'bg-orange-50 border-orange-500' :
                   'bg-yellow-50 border-yellow-500'
                 }`}
               >
-                <div className="flex justify-between items-start">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-2">
                   <div className="flex-1">
                     <div className="flex items-center mb-1">
-                      <AlertTriangle className={`h-4 w-4 mr-2 ${
+                      <AlertTriangle className={`h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 ${
                         alert.severity === 'HIGH' ? 'text-red-600' :
                         alert.severity === 'MEDIUM' ? 'text-orange-600' :
                         'text-yellow-600'
@@ -958,7 +958,7 @@ export default function PersonaDashboard({ customerId }: PersonaDashboardProps) 
                         {alert.severity}
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 mb-1">{alert.message}</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 mb-1">{alert.message}</p>
                     <p className="text-xs text-gray-600 flex items-center">
                       <Lightbulb className="h-3 w-3 mr-1" />
                       {alert.recommendation}
@@ -968,7 +968,7 @@ export default function PersonaDashboard({ customerId }: PersonaDashboardProps) 
                     <button
                       onClick={() => handleExecuteAction(alert.alert_id, alert.action_type)}
                       disabled={executingAction === alert.alert_id}
-                      className={`ml-4 flex items-center space-x-2 px-3 py-2 rounded text-sm font-medium transition-colors ${
+                      className={`flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded text-xs sm:text-sm font-medium transition-colors ${
                         executingAction === alert.alert_id
                           ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           : 'bg-blue-600 text-white hover:bg-blue-700'

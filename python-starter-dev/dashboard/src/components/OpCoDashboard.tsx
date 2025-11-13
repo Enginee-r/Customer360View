@@ -114,13 +114,13 @@ export default function OpCoDashboard({ opCoId, onSelectCustomer }: OpCoDashboar
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3 sm:space-y-5">
       {/* OpCo Header */}
-      <div className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
-        <div className="flex items-center gap-3">
-          <div className="text-2xl">{opCoInfo?.code}</div>
+      <div className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-2 sm:p-3 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="text-lg sm:text-2xl">{opCoInfo?.code}</div>
           <div>
-            <h2 className="text-xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+            <h2 className="text-base sm:text-xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
               {opCoInfo?.name}
             </h2>
             <p className="text-xs text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
@@ -131,48 +131,48 @@ export default function OpCoDashboard({ opCoId, onSelectCustomer }: OpCoDashboar
       </div>
 
       {/* Search prompt */}
-      <div className="text-center py-4 mt-4">
-        <Globe className="mx-auto h-10 w-10 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle" />
+      <div className="text-center py-3 sm:py-4 mt-2 sm:mt-4">
+        <Globe className="mx-auto h-8 w-8 sm:h-10 sm:w-10 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle" />
         <h3 className="mt-2 text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
           Search for a customer in {opCoInfo?.name}
         </h3>
-        <p className="mt-1 text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
+        <p className="mt-1 text-xs sm:text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle px-4">
           Use the search bar above to find customers operating in this country
         </p>
       </div>
 
       {/* Key Insights Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-5">
         <div
           onClick={handleTotalCustomersClick}
-          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-brand"
+          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-brand"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Total Customers</h3>
-            <svg className="h-5 w-5 text-datacamp-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-between mb-2 sm:mb-0">
+            <h3 className="text-xs sm:text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Total Customers</h3>
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
-          <p className="mt-4 text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+          <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
             {formatNumber(dashboardData.total_customers)}
           </p>
-          <p className="mt-2 text-xs text-datacamp-success">Active accounts • Click to view</p>
+          <p className="mt-1 sm:mt-2 text-xs text-datacamp-success">Active accounts</p>
         </div>
 
         <div
           onClick={handleRevenueClick}
-          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-success"
+          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-success"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Annual Revenue</h3>
-            <svg className="h-5 w-5 text-datacamp-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-between mb-2 sm:mb-0">
+            <h3 className="text-xs sm:text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Annual Revenue</h3>
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <p className="mt-4 text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+          <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
             ${formatNumber(dashboardData.total_revenue)}
           </p>
-          <p className="mt-2 text-xs text-datacamp-success">Total ARR • Click to view</p>
+          <p className="mt-1 sm:mt-2 text-xs text-datacamp-success">Total ARR</p>
         </div>
 
         <div

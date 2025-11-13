@@ -100,11 +100,11 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3 sm:space-y-5">
       {/* Search prompt */}
-      <div className="text-center py-4 mt-4">
+      <div className="text-center py-3 sm:py-4 mt-2 sm:mt-4">
         <svg
-          className="mx-auto h-10 w-10 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle"
+          className="mx-auto h-8 w-8 sm:h-10 sm:w-10 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -119,85 +119,85 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
         <h3 className="mt-2 text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
           Search for a customer
         </h3>
-        <p className="mt-1 text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
+        <p className="mt-1 text-xs sm:text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle px-4">
           Get started by searching for a customer above to view their 360° profile
         </p>
       </div>
 
       {/* Key Insights Grid - using real data */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-5">
         <div
           onClick={handleTotalCustomersClick}
-          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-brand"
+          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-brand"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Total Customers</h3>
-            <svg className="h-5 w-5 text-datacamp-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-between mb-2 sm:mb-0">
+            <h3 className="text-xs sm:text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Total Customers</h3>
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
-          <p className="mt-4 text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+          <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
             {formatNumber(dashboardData.total_customers)}
           </p>
-          <p className="mt-2 text-xs text-datacamp-success">Active accounts • Click to view</p>
+          <p className="mt-1 sm:mt-2 text-xs text-datacamp-success">Active accounts</p>
         </div>
 
         <div
           onClick={handleRevenueClick}
-          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-success"
+          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-success"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Annual Revenue</h3>
-            <svg className="h-5 w-5 text-datacamp-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-between mb-2 sm:mb-0">
+            <h3 className="text-xs sm:text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Annual Revenue</h3>
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <p className="mt-4 text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+          <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
             ${formatNumber(dashboardData.total_revenue)}
           </p>
-          <p className="mt-2 text-xs text-datacamp-success">Total ARR • Click to view</p>
+          <p className="mt-1 sm:mt-2 text-xs text-datacamp-success">Total ARR</p>
         </div>
 
         <div
           onClick={handleHealthScoreClick}
-          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-warning"
+          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-warning"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Avg Health Score</h3>
-            <svg className="h-5 w-5 text-datacamp-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-between mb-2 sm:mb-0">
+            <h3 className="text-xs sm:text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">Avg Health</h3>
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
-          <p className="mt-4 text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+          <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
             {dashboardData.avg_health_score.toFixed(1)}
           </p>
-          <p className="mt-2 text-xs text-datacamp-text-subtle">Across all accounts • Click to view</p>
+          <p className="mt-1 sm:mt-2 text-xs text-datacamp-text-subtle">All accounts</p>
         </div>
 
         <div
           onClick={handleAtRiskClick}
-          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-red"
+          className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary cursor-pointer transition-all hover:shadow-lg hover:scale-105 hover:border-datacamp-red"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">At-Risk Accounts</h3>
-            <svg className="h-5 w-5 text-datacamp-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-between mb-2 sm:mb-0">
+            <h3 className="text-xs sm:text-sm font-medium text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">At-Risk</h3>
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <p className="mt-4 text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+          <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
             {dashboardData.high_risk_customers}
           </p>
-          <p className="mt-2 text-xs text-datacamp-red">Require attention • Click to view</p>
+          <p className="mt-1 sm:mt-2 text-xs text-datacamp-red">Need attention</p>
         </div>
       </div>
 
       {/* Top Customers Section - Collapsible */}
       {(showTopRevenue || showAtRisk) && (
-        <div id="top-customers-section" className="scroll-mt-5">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div id="top-customers-section" className="scroll-mt-3 sm:scroll-mt-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5">
             {/* Top Revenue Customers */}
             {showTopRevenue && (
-              <div ref={topRevenueRef} className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
+              <div ref={topRevenueRef} className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-datacamp-text-primary dark:text-datacamp-dark-text-primary flex items-center gap-2">
                     <svg className="h-5 w-5 text-datacamp-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,10 +316,10 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
       )}
 
       {/* Customer Distribution Sections with real data */}
-      <div id="health-distribution" className="grid grid-cols-1 lg:grid-cols-3 gap-5 scroll-mt-5">
+      <div id="health-distribution" className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-5 scroll-mt-3 sm:scroll-mt-5">
         {/* Health Distribution */}
-        <div className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary lg:col-span-2">
-          <h3 className="text-lg font-semibold text-datacamp-text-primary dark:text-datacamp-dark-text-primary mb-4">
+        <div className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary lg:col-span-2">
+          <h3 className="text-base sm:text-lg font-semibold text-datacamp-text-primary dark:text-datacamp-dark-text-primary mb-3 sm:mb-4">
             Customer Health Distribution
           </h3>
           <div className="space-y-3">
@@ -485,11 +485,11 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
         </div>
 
         {/* Regional Split */}
-        <div className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
-          <h3 className="text-lg font-semibold text-datacamp-text-primary dark:text-datacamp-dark-text-primary mb-4">
+        <div className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 sm:p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
+          <h3 className="text-base sm:text-lg font-semibold text-datacamp-text-primary dark:text-datacamp-dark-text-primary mb-3 sm:mb-4">
             Top Regions
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {Object.entries(dashboardData.region_distribution || {})
               .sort(([, a]: any, [, b]: any) => b - a)
               .slice(0, 5)
@@ -610,9 +610,76 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-datacamp-bg-main dark:bg-datacamp-dark-bg-main transition-colors">
-        <header className="shadow-sm border-b border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-main overflow-x-auto overflow-y-visible">
-          <div className="mx-auto px-3 py-3 sm:px-6 lg:px-8 min-w-max relative">
-            <div className="flex items-center justify-between gap-3 sm:gap-4">
+        <header className="shadow-sm border-b border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-main">
+          <div className="mx-auto px-2 py-2 sm:px-6 lg:px-8">
+            {/* Mobile Layout */}
+            <div className="md:hidden">
+              {/* Top row - Logo and Dark Mode */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <a
+                    href="https://www.cassavatechnologies.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 hover:opacity-80 transition-opacity"
+                    aria-label="Cassava Technologies"
+                  >
+                    <img
+                      src="https://www.cassavatechnologies.com/wp-content/uploads/2022/06/Cassava-Logo.png"
+                      alt="Cassava Technologies"
+                      className="h-6 w-auto"
+                    />
+                  </a>
+                  <h1
+                    className="text-sm font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary cursor-pointer"
+                    onClick={() => {
+                      setSelectedCustomerId(null);
+                      setSelectedOpCo(null);
+                      setSelectedBusinessUnit(null);
+                    }}
+                  >
+                    Customer 360°
+                  </h1>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-datacamp-brand/10 text-datacamp-brand border border-datacamp-brand/20">
+                    Live
+                  </span>
+                  <button
+                    onClick={toggleDarkMode}
+                    className="p-1.5 rounded-lg bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-secondary hover:bg-datacamp-bg-tertiary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors"
+                    aria-label="Toggle dark mode"
+                  >
+                    {darkMode ? (
+                      <Sun className="h-4 w-4 text-datacamp-brand" />
+                    ) : (
+                      <Moon className="h-4 w-4 text-datacamp-text-subtle" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              {/* Second row - Filters and Search */}
+              <div className="flex items-center gap-1.5">
+                <OpCoSwitcher
+                  selectedOpCo={selectedOpCo}
+                  onSelectOpCo={setSelectedOpCo}
+                />
+                <BusinessUnitSwitcher
+                  selectedBusinessUnit={selectedBusinessUnit}
+                  onSelectBusinessUnit={setSelectedBusinessUnit}
+                />
+                <div className="flex-1 min-w-0">
+                  <CustomerSearch
+                    onSelectCustomer={setSelectedCustomerId}
+                    opCoFilter={selectedOpCo}
+                    subsidiaryFilter={selectedBusinessUnit}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Layout */}
+            <div className="hidden md:flex items-center justify-between gap-3 sm:gap-4">
               {/* Left side - Logo and Title */}
               <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 <a
@@ -645,7 +712,7 @@ function App() {
                       setSelectedOpCo(null);
                       setSelectedBusinessUnit(null);
                     }}
-                    className="text-xs font-medium mt-0.5 hover:opacity-80 transition-opacity inline-block hidden sm:inline-block text-left whitespace-nowrap"
+                    className="text-xs font-medium mt-0.5 hover:opacity-80 transition-opacity inline-block text-left whitespace-nowrap"
                     style={{ color: '#00c0ab' }}
                   >
                     Intelligence Platform
@@ -654,7 +721,7 @@ function App() {
               </div>
 
               {/* Right side - Search and Actions */}
-              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-8 sm:ml-12 md:ml-16">
+              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 <OpCoSwitcher
                   selectedOpCo={selectedOpCo}
                   onSelectOpCo={setSelectedOpCo}
@@ -663,7 +730,7 @@ function App() {
                   selectedBusinessUnit={selectedBusinessUnit}
                   onSelectBusinessUnit={setSelectedBusinessUnit}
                 />
-                <div className="w-48 sm:w-56 md:w-72 lg:w-80">
+                <div className="w-56 md:w-72 lg:w-80">
                   <CustomerSearch
                     onSelectCustomer={setSelectedCustomerId}
                     opCoFilter={selectedOpCo}
@@ -676,12 +743,12 @@ function App() {
                   aria-label="Toggle dark mode"
                 >
                   {darkMode ? (
-                    <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-brand" />
+                    <Sun className="h-5 w-5 text-datacamp-brand" />
                   ) : (
-                    <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-text-subtle" />
+                    <Moon className="h-5 w-5 text-datacamp-text-subtle" />
                   )}
                 </button>
-                <span className="hidden sm:inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-datacamp-brand/10 text-datacamp-brand border border-datacamp-brand/20 flex-shrink-0 whitespace-nowrap">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-datacamp-brand/10 text-datacamp-brand border border-datacamp-brand/20 flex-shrink-0 whitespace-nowrap">
                   Live
                 </span>
               </div>
@@ -689,7 +756,7 @@ function App() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+        <main className="max-w-7xl mx-auto px-2 py-3 sm:px-4 sm:py-4 md:px-6 lg:px-8">
 
           {/* Content area with proper spacing */}
           <div className="relative z-0 pt-3">
