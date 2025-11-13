@@ -1,0 +1,109 @@
+{
+  "opcos": [
+    {
+      "id": "south-africa",
+      "name": "South Africa",
+      "code": "🇿🇦",
+      "region": "Southern Africa",
+      "data_region": "Southern Africa"
+    },
+    {
+      "id": "zimbabwe",
+      "name": "Zimbabwe",
+      "code": "🇿🇼",
+      "region": "Southern Africa",
+      "data_region": "Southern Africa"
+    },
+    {
+      "id": "zambia",
+      "name": "Zambia",
+      "code": "🇿🇲",
+      "region": "Southern Africa",
+      "data_region": "Southern Africa"
+    },
+    {
+      "id": "botswana",
+      "name": "Botswana",
+      "code": "🇧🇼",
+      "region": "Southern Africa",
+      "data_region": "Southern Africa"
+    },
+    {
+      "id": "lesotho",
+      "name": "Lesotho",
+      "code": "🇱🇸",
+      "region": "Southern Africa",
+      "data_region": "Southern Africa"
+    },
+    {
+      "id": "malawi",
+      "name": "Malawi",
+      "code": "🇲🇼",
+      "region": "Southern Africa",
+      "data_region": "Southern Africa"
+    },
+    {
+      "id": "kenya",
+      "name": "Kenya",
+      "code": "🇰🇪",
+      "region": "East Africa",
+      "data_region": "East Africa"
+    },
+    {
+      "id": "tanzania",
+      "name": "Tanzania",
+      "code": "🇹🇿",
+      "region": "East Africa",
+      "data_region": "East Africa"
+    },
+    {
+      "id": "uganda",
+      "name": "Uganda",
+      "code": "🇺🇬",
+      "region": "East Africa",
+      "data_region": "East Africa"
+    },
+    {
+      "id": "rwanda",
+      "name": "Rwanda",
+      "code": "🇷🇼",
+      "region": "East Africa",
+      "data_region": "East Africa"
+    },
+    {
+      "id": "nigeria",
+      "name": "Nigeria",
+      "code": "🇳🇬",
+      "region": "West Africa",
+      "data_region": "West Africa"
+    },
+    {
+      "id": "ghana",
+      "name": "Ghana",
+      "code": "🇬🇭",
+      "region": "West Africa",
+      "data_region": "West Africa"
+    },
+    {
+      "id": "drc",
+      "name": "DR Congo",
+      "code": "🇨🇩",
+      "region": "Central Africa",
+      "data_region": "Central Africa"
+    },
+    {
+      "id": "egypt",
+      "name": "Egypt",
+      "code": "🇪🇬",
+      "region": "North Africa",
+      "data_region": "North Africa"
+    },
+    {
+      "id": "morocco",
+      "name": "Morocco",
+      "code": "🇲🇦",
+      "region": "North Africa",
+      "data_region": "North Africa"
+    }
+  ]
+}

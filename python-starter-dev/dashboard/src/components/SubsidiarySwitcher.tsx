@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Building2, ChevronDown } from 'lucide-react';
 
-interface Subsidiary {
+interface BusinessUnit {
   id: string;
   name: string;
   short_name: string;
@@ -10,41 +10,41 @@ interface Subsidiary {
   description: string;
 }
 
-interface SubsidiarySwitcherProps {
-  selectedSubsidiary: string | null;
-  onSelectSubsidiary: (subsidiaryId: string | null) => void;
+interface BusinessUnitSwitcherProps {
+  selectedBusinessUnit: string | null;
+  onSelectBusinessUnit: (businessUnitId: string | null) => void;
 }
 
-export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidiary }: SubsidiarySwitcherProps) {
-  const [subsidiaries, setSubsidiaries] = useState<Subsidiary[]>([]);
+export default function BusinessUnitSwitcher({ selectedBusinessUnit, onSelectBusinessUnit }: BusinessUnitSwitcherProps) {
+  const [businessUnits, setBusinessUnits] = useState<BusinessUnit[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [stats, setStats] = useState<Record<string, any>>({});
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    // Fetch subsidiaries list
+    // Fetch business units list
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
     fetch(`${apiUrl}/subsidiaries`)
       .then(res => res.json())
       .then(data => {
-        setSubsidiaries(data.subsidiaries || []);
+        setBusinessUnits(data.subsidiaries || []);
       })
-      .catch(err => console.error('Error fetching subsidiaries:', err));
+      .catch(err => console.error('Error fetching business units:', err));
   }, []);
 
   useEffect(() => {
-    // Fetch stats for selected subsidiary
-    if (selectedSubsidiary) {
+    // Fetch stats for selected business unit
+    if (selectedBusinessUnit) {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-      fetch(`${apiUrl}/subsidiary/${selectedSubsidiary}/stats`)
+      fetch(`${apiUrl}/subsidiary/${selectedBusinessUnit}/stats`)
         .then(res => res.json())
         .then(data => {
-          setStats(prev => ({ ...prev, [selectedSubsidiary]: data }));
+          setStats(prev => ({ ...prev, [selectedBusinessUnit]: data }));
         })
-        .catch(err => console.error('Error fetching subsidiary stats:', err));
+        .catch(err => console.error('Error fetching business unit stats:', err));
     }
-  }, [selectedSubsidiary]);
+  }, [selectedBusinessUnit]);
 
   useEffect(() => {
     // Update dropdown position when it opens
@@ -63,7 +63,7 @@ export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidi
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       if (buttonRef.current && !buttonRef.current.contains(target)) {
-        const dropdownElement = document.querySelector('[data-dropdown="subsidiary-switcher"]');
+        const dropdownElement = document.querySelector('[data-dropdown="business-unit-switcher"]');
         if (!dropdownElement || !dropdownElement.contains(target)) {
           setIsOpen(false);
         }
@@ -76,8 +76,8 @@ export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidi
     }
   }, [isOpen]);
 
-  const currentSubsidiary = subsidiaries.find(s => s.id === selectedSubsidiary);
-  const currentStats = selectedSubsidiary ? stats[selectedSubsidiary] : null;
+  const currentBusinessUnit = businessUnits.find(s => s.id === selectedBusinessUnit);
+  const currentStats = selectedBusinessUnit ? stats[selectedBusinessUnit] : null;
 
   const dropdownContent = isOpen && createPortal(
     <>
@@ -89,7 +89,7 @@ export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidi
 
       {/* Dropdown */}
       <div
-        data-dropdown="subsidiary-switcher"
+        data-dropdown="business-unit-switcher"
         className="rounded-lg shadow-lg bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary max-h-96 overflow-y-auto"
         style={{
           position: 'fixed',
@@ -99,21 +99,21 @@ export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidi
           zIndex: 9999,
         }}
       >
-        {/* All Subsidiaries Option */}
+        {/* All Business Units Option */}
         <button
           onClick={() => {
-            onSelectSubsidiary(null);
+            onSelectBusinessUnit(null);
             setIsOpen(false);
           }}
           className={`w-full text-left px-4 py-3 hover:bg-datacamp-bg-secondary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors border-b border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary ${
-            !selectedSubsidiary ? 'bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-tertiary' : ''
+            !selectedBusinessUnit ? 'bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-tertiary' : ''
           }`}
         >
           <div className="flex items-center gap-3">
             <div className="h-2 w-2 rounded-full bg-gray-400" />
             <div className="flex-1">
               <div className="text-sm font-semibold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
-                All Subsidiaries
+                All Business Units
               </div>
               <div className="text-xs text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
                 View all Cassava Group customers
@@ -122,18 +122,18 @@ export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidi
           </div>
         </button>
 
-        {/* Individual Subsidiaries */}
-        {subsidiaries.map(sub => {
+        {/* Individual Business Units */}
+        {businessUnits.map(sub => {
           const subStats = stats[sub.id];
           return (
             <button
               key={sub.id}
               onClick={() => {
-                onSelectSubsidiary(sub.id);
+                onSelectBusinessUnit(sub.id);
                 setIsOpen(false);
               }}
               className={`w-full text-left px-4 py-3 hover:bg-datacamp-bg-secondary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors border-b border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary last:border-b-0 ${
-                selectedSubsidiary === sub.id ? 'bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-tertiary' : ''
+                selectedBusinessUnit === sub.id ? 'bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-tertiary' : ''
               }`}
             >
               <div className="flex items-center gap-3">
@@ -169,14 +169,14 @@ export default function SubsidiarySwitcher({ selectedSubsidiary, onSelectSubsidi
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-secondary hover:bg-datacamp-bg-tertiary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary"
-        style={currentSubsidiary ? { borderColor: currentSubsidiary.color + '40' } : {}}
+        style={currentBusinessUnit ? { borderColor: currentBusinessUnit.color + '40' } : {}}
       >
         <Building2
           className="h-4 w-4"
-          style={currentSubsidiary ? { color: currentSubsidiary.color } : {}}
+          style={currentBusinessUnit ? { color: currentBusinessUnit.color } : {}}
         />
         <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary whitespace-nowrap">
-          {currentSubsidiary ? currentSubsidiary.short_name : 'All Subsidiaries'}
+          {currentBusinessUnit ? currentBusinessUnit.short_name : 'All Business Units'}
         </span>
         <ChevronDown className="h-4 w-4 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle" />
       </button>

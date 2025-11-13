@@ -6,10 +6,11 @@ import { searchCustomers } from '../api/customer360';
 
 interface CustomerSearchProps {
   onSelectCustomer: (customerId: string) => void;
+  opCoFilter?: string | null;
   subsidiaryFilter?: string | null;
 }
 
-export default function CustomerSearch({ onSelectCustomer, subsidiaryFilter }: CustomerSearchProps) {
+export default function CustomerSearch({ onSelectCustomer, opCoFilter, subsidiaryFilter: businessUnitFilter }: CustomerSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -44,13 +45,30 @@ export default function CustomerSearch({ onSelectCustomer, subsidiaryFilter }: C
   }, [showResults]);
 
   const { data: customers, isLoading } = useQuery(
-    ['customers', searchQuery, subsidiaryFilter],
+    ['customers', searchQuery, opCoFilter, businessUnitFilter],
     async () => {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-      // If subsidiary filter is active, fetch from subsidiary endpoint
-      if (subsidiaryFilter) {
-        const response = await fetch(`${apiUrl}/subsidiary/${subsidiaryFilter}/customers`);
+      // If business unit filter is active, fetch from business unit endpoint
+      if (businessUnitFilter) {
+        const url = opCoFilter
+          ? `${apiUrl}/subsidiary/${businessUnitFilter}/customers?opco=${opCoFilter}`
+          : `${apiUrl}/subsidiary/${businessUnitFilter}/customers`;
+        const response = await fetch(url);
+        const allCustomers = await response.json();
+
+        // Filter by search query if provided
+        if (searchQuery) {
+          return allCustomers.filter((c: any) =>
+            c.account_name.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        return allCustomers;
+      }
+
+      // If only OpCo filter is active
+      if (opCoFilter) {
+        const response = await fetch(`${apiUrl}/opco/${opCoFilter}/customers`);
         const allCustomers = await response.json();
 
         // Filter by search query if provided

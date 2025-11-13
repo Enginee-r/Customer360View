@@ -24,7 +24,7 @@ interface ChatbotProps {
 export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onReset }) => {
   const initialMessage = {
     role: 'assistant' as const,
-    content: 'Hello! I\'m your Customer 360 Assistant for Cassava Technologies. I can help you understand your customer data!\n\nAsk me about:\n- Customer health and risk\n- Revenue and top customers\n- Regional distribution\n- Satisfaction metrics (NPS, CSAT, CES, CLV)\n- Specific customer information\n\nWhat would you like to know?',
+    content: 'Hello! I\'m your One Cassava Customer 360 Assistant. I can help you understand your customer data!\n\nAsk me about:\n- Customer health and risk\n- Revenue and top customers\n- Regional distribution\n- Satisfaction metrics (NPS, CSAT, CES, CLV)\n- Specific customer information\n\nWhat would you like to know?',
     timestamp: new Date()
   };
 
@@ -230,7 +230,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onReset }) =>
         <div className="flex items-center gap-2">
           <MessageSquare className="h-5 w-5 text-datacamp-brand" />
           <h3 className="font-semibold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
-            Customer 360 Assistant
+            One Cassava Customer 360 Assistant
           </h3>
         </div>
         <button

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import MetricCard from './MetricCard';
 
-interface SubsidiaryInfo {
+interface BusinessUnitInfo {
   id: string;
   name: string;
   short_name: string;
@@ -26,8 +26,9 @@ interface SubsidiaryInfo {
   website?: string;
 }
 
-interface SubsidiaryDashboardProps {
+interface BusinessUnitDashboardProps {
   subsidiaryId: string;
+  opCoId?: string | null;
   onSelectCustomer?: (customerId: string) => void;
 }
 
@@ -62,29 +63,32 @@ interface DashboardData {
   avg_revenue_per_customer: number;
 }
 
-export default function SubsidiaryDashboard({ subsidiaryId, onSelectCustomer }: SubsidiaryDashboardProps) {
-  const [subsidiaryInfo, setSubsidiaryInfo] = useState<SubsidiaryInfo | null>(null);
+export default function BusinessUnitDashboard({ subsidiaryId, opCoId, onSelectCustomer }: BusinessUnitDashboardProps) {
+  const [businessUnitInfo, setBusinessUnitInfo] = useState<BusinessUnitInfo | null>(null);
 
-  // Fetch subsidiary information
+  // Fetch business unit information
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
     fetch(`${apiUrl}/subsidiaries`)
       .then(res => res.json())
       .then(data => {
-        const sub = data.subsidiaries?.find((s: SubsidiaryInfo) => s.id === subsidiaryId);
+        const sub = data.subsidiaries?.find((s: BusinessUnitInfo) => s.id === subsidiaryId);
         if (sub) {
-          setSubsidiaryInfo(sub);
+          setBusinessUnitInfo(sub);
         }
       })
-      .catch(err => console.error('Error fetching subsidiary info:', err));
+      .catch(err => console.error('Error fetching business unit info:', err));
   }, [subsidiaryId]);
 
   // Fetch dashboard data
   const { data: dashboardData, isLoading } = useQuery<DashboardData>(
-    ['subsidiary-dashboard', subsidiaryId],
+    ['business-unit-dashboard', subsidiaryId, opCoId],
     async () => {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-      const response = await fetch(`${apiUrl}/subsidiary/${subsidiaryId}/dashboard`);
+      const url = opCoId
+        ? `${apiUrl}/subsidiary/${subsidiaryId}/dashboard?opco=${opCoId}`
+        : `${apiUrl}/subsidiary/${subsidiaryId}/dashboard`;
+      const response = await fetch(url);
       return response.json();
     },
     {
@@ -113,7 +117,7 @@ export default function SubsidiaryDashboard({ subsidiaryId, onSelectCustomer }: 
     );
   }
 
-  if (!dashboardData || !subsidiaryInfo) {
+  if (!dashboardData || !businessUnitInfo) {
     return (
       <div className="text-center py-12">
         <p className="text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
@@ -123,7 +127,7 @@ export default function SubsidiaryDashboard({ subsidiaryId, onSelectCustomer }: 
     );
   }
 
-  const accentColor = subsidiaryInfo.color;
+  const accentColor = businessUnitInfo.color;
 
   return (
     <div className="space-y-6 p-6">
@@ -138,20 +142,20 @@ export default function SubsidiaryDashboard({ subsidiaryId, onSelectCustomer }: 
               <Building2 className="h-8 w-8" style={{ color: accentColor }} />
               <div>
                 <h1 className="text-3xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
-                  {subsidiaryInfo.name}
+                  {businessUnitInfo.name}
                 </h1>
                 <p className="text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle mt-1">
-                  {subsidiaryInfo.description}
+                  {businessUnitInfo.description}
                 </p>
               </div>
             </div>
 
             {/* Countries */}
-            {subsidiaryInfo.countries && subsidiaryInfo.countries.length > 0 && (
+            {businessUnitInfo.countries && businessUnitInfo.countries.length > 0 && (
               <div className="mt-4 flex items-start gap-2">
                 <Globe className="h-4 w-4 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle mt-0.5" />
                 <div className="flex flex-wrap gap-1.5">
-                  {subsidiaryInfo.countries.map((country, idx) => (
+                  {businessUnitInfo.countries.map((country, idx) => (
                     <span
                       key={idx}
                       className="px-2 py-0.5 text-xs rounded bg-datacamp-bg-tertiary dark:bg-datacamp-dark-bg-tertiary text-datacamp-text-primary dark:text-datacamp-dark-text-primary"
@@ -164,9 +168,9 @@ export default function SubsidiaryDashboard({ subsidiaryId, onSelectCustomer }: 
             )}
           </div>
 
-          {subsidiaryInfo.website && (
+          {businessUnitInfo.website && (
             <a
-              href={subsidiaryInfo.website}
+              href={businessUnitInfo.website}
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"

@@ -27,7 +27,7 @@ import {
 import { getCustomer360, getCustomerAlerts, getCustomerRecommendations, executeAction } from '../api/customer360';
 import MetricCard from './MetricCard';
 import MetricDrillDownModal from './MetricDrillDownModal';
-import SubsidiaryCard from './SubsidiaryCard';
+import BusinessUnitCard from './SubsidiaryCard';
 
 interface PersonaDashboardProps {
   customerId: string;
@@ -55,8 +55,8 @@ export default function PersonaDashboard({ customerId }: PersonaDashboardProps) 
     () => getCustomerRecommendations(customerId)
   );
 
-  const { data: subsidiaryConfig } = useQuery(
-    ['subsidiaries'],
+  const { data: businessUnitConfig } = useQuery(
+    ['business-units'],
     () => {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
       return fetch(`${apiUrl}/subsidiaries`).then(res => res.json());
@@ -907,11 +907,12 @@ export default function PersonaDashboard({ customerId }: PersonaDashboardProps) 
         </div>
       </div>
 
-      {/* Subsidiary Relationships */}
+      {/* Business Unit Relationships */}
       {customer.subsidiaries && (
-        <SubsidiaryCard
-          subsidiaries={JSON.parse(customer.subsidiaries)}
-          subsidiaryConfig={subsidiaryConfig}
+        <BusinessUnitCard
+          subsidiaries={typeof customer.subsidiaries === 'string' ? JSON.parse(customer.subsidiaries) : customer.subsidiaries}
+          subsidiaryConfig={businessUnitConfig}
+          customerData={customer}
         />
       )}
 

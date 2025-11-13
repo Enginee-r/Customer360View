@@ -1,19 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
-import { Moon, Sun, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
-import CustomerSearch from './components/CustomerSearch';
-import PersonaDashboard from './components/PersonaDashboard';
-import MetricDrillDown from './components/MetricDrillDown';
-import { Chatbot } from './components/Chatbot';
-import OpCoSwitcher from './components/OpCoSwitcher';
-import OpCoDashboard from './components/OpCoDashboard';
-import BusinessUnitSwitcher from './components/SubsidiarySwitcher';
-import BusinessUnitDashboard from './components/SubsidiaryDashboard';
-import CustomerListItem from './components/CustomerListItem';
+import { useQuery } from 'react-query';
+import { ChevronDown, ChevronUp, Globe } from 'lucide-react';
+import CustomerListItem from './CustomerListItem';
 
-const queryClient = new QueryClient();
+interface OpCo {
+  id: string;
+  name: string;
+  code: string;
+  region: string;
+}
 
-function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: (customerId: string) => void, selectedOpCo: string | null }) {
+interface OpCoDashboardProps {
+  opCoId: string;
+  onSelectCustomer: (customerId: string) => void;
+}
+
+export default function OpCoDashboard({ opCoId, onSelectCustomer }: OpCoDashboardProps) {
+  const [opCoInfo, setOpCoInfo] = useState<OpCo | null>(null);
   const [expandedHealthStatus, setExpandedHealthStatus] = useState<string | null>(null);
   const [expandedRegion, setExpandedRegion] = useState<string | null>(null);
   const [showTopRevenue, setShowTopRevenue] = useState<boolean>(false);
@@ -22,6 +25,20 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
   // Refs for click-outside detection
   const topRevenueRef = useRef<HTMLDivElement>(null);
   const atRiskRef = useRef<HTMLDivElement>(null);
+
+  // Fetch OpCo information
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    fetch(`${apiUrl}/opcos`)
+      .then(res => res.json())
+      .then(data => {
+        const opco = data.opcos?.find((o: OpCo) => o.id === opCoId);
+        if (opco) {
+          setOpCoInfo(opco);
+        }
+      })
+      .catch(err => console.error('Error fetching OpCo info:', err));
+  }, [opCoId]);
 
   // Click-outside handler
   useEffect(() => {
@@ -76,12 +93,9 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
     scrollToElement('health-distribution');
   };
 
-  const { data: dashboardData } = useQuery(['dashboard-summary', selectedOpCo], async () => {
+  const { data: dashboardData } = useQuery(['opco-dashboard', opCoId], async () => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-    const url = selectedOpCo
-      ? `${apiUrl}/dashboard/summary?opco=${selectedOpCo}`
-      : `${apiUrl}/dashboard/summary`;
-    const response = await fetch(url);
+    const response = await fetch(`${apiUrl}/opco/${opCoId}/dashboard`);
     return response.json();
   });
 
@@ -101,30 +115,33 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
 
   return (
     <div className="space-y-5">
+      {/* OpCo Header */}
+      <div className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-3 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary">
+        <div className="flex items-center gap-3">
+          <div className="text-2xl">{opCoInfo?.code}</div>
+          <div>
+            <h2 className="text-xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
+              {opCoInfo?.name}
+            </h2>
+            <p className="text-xs text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
+              {opCoInfo?.region} Region • Operational Country View
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Search prompt */}
       <div className="text-center py-4 mt-4">
-        <svg
-          className="mx-auto h-10 w-10 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
+        <Globe className="mx-auto h-10 w-10 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle" />
         <h3 className="mt-2 text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary">
-          Search for a customer
+          Search for a customer in {opCoInfo?.name}
         </h3>
         <p className="mt-1 text-sm text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">
-          Get started by searching for a customer above to view their 360° profile
+          Use the search bar above to find customers operating in this country
         </p>
       </div>
 
-      {/* Key Insights Grid - using real data */}
+      {/* Key Insights Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <div
           onClick={handleTotalCustomersClick}
@@ -315,14 +332,14 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
         </div>
       )}
 
-      {/* Customer Distribution Sections with real data */}
+      {/* Customer Distribution Sections */}
       <div id="health-distribution" className="grid grid-cols-1 lg:grid-cols-3 gap-5 scroll-mt-5">
         {/* Health Distribution */}
         <div className="bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-secondary rounded-lg p-5 border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary lg:col-span-2">
           <h3 className="text-lg font-semibold text-datacamp-text-primary dark:text-datacamp-dark-text-primary mb-4">
             Customer Health Distribution
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {/* Healthy */}
             {dashboardData.health_distribution.Healthy > 0 && (
               <div className="bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-main rounded-lg p-3">
@@ -476,208 +493,3 @@ function GroupDashboard({ onSelectCustomer, selectedOpCo }: { onSelectCustomer: 
     </div>
   );
 }
-
-function App() {
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
-  const [selectedOpCo, setSelectedOpCo] = useState<string | null>(null);
-  const [selectedBusinessUnit, setSelectedBusinessUnit] = useState<string | null>(null);
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
-  });
-  const [drillDownMetric, setDrillDownMetric] = useState<'customers' | 'revenue' | 'health' | 'at-risk' | null>(null);
-  const [filterCriteria, setFilterCriteria] = useState<{ type: 'health' | 'region', value: string } | null>(null);
-  const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
-  }, [darkMode]);
-
-  // Check if current customer belongs to newly selected business unit
-  useEffect(() => {
-    // Only run this check when:
-    // 1. A customer is currently selected
-    // 2. A business unit filter is applied (not "All Business Units")
-    if (selectedCustomerId && selectedBusinessUnit) {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-
-      // Fetch the customer data to check their business units
-      fetch(`${apiUrl}/customer/${selectedCustomerId}`)
-        .then(res => res.json())
-        .then(customer => {
-          // Parse the subsidiaries array (backend still uses this field name)
-          let customerBusinessUnits: any[] = [];
-          try {
-            customerBusinessUnits = typeof customer.subsidiaries === 'string'
-              ? JSON.parse(customer.subsidiaries)
-              : customer.subsidiaries || [];
-          } catch (e) {
-            console.error('Error parsing customer business units:', e);
-            customerBusinessUnits = [];
-          }
-
-          // Check if the customer belongs to the selected business unit
-          const belongsToBusinessUnit = customerBusinessUnits.some(
-            (sub: any) => sub.subsidiary_id === selectedBusinessUnit
-          ) || customer.primary_subsidiary === selectedBusinessUnit;
-
-          // If customer doesn't belong to this business unit, clear selection
-          // This will redirect back to the business unit main page
-          if (!belongsToBusinessUnit) {
-            setSelectedCustomerId(null);
-          }
-        })
-        .catch(err => {
-          console.error('Error checking customer business unit:', err);
-          // On error, clear customer selection to be safe
-          setSelectedCustomerId(null);
-        });
-    }
-  }, [selectedBusinessUnit]); // Only trigger when business unit changes
-
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-datacamp-bg-main dark:bg-datacamp-dark-bg-main transition-colors">
-        <header className="shadow-sm border-b border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-main overflow-x-auto overflow-y-visible">
-          <div className="mx-auto px-3 py-3 sm:px-6 lg:px-8 min-w-max relative">
-            <div className="flex items-center justify-between gap-3 sm:gap-4">
-              {/* Left side - Logo and Title */}
-              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                <a
-                  href="https://www.cassavatechnologies.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-shrink-0 hover:opacity-80 transition-opacity"
-                  aria-label="Cassava Technologies"
-                >
-                  <img
-                    src="https://www.cassavatechnologies.com/wp-content/uploads/2022/06/Cassava-Logo.png"
-                    alt="Cassava Technologies"
-                    className="h-8 sm:h-10 w-auto"
-                  />
-                </a>
-                <div className="border-l border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary pl-2 sm:pl-4 h-10 sm:h-12 flex flex-col justify-center">
-                  <h1
-                    className="text-base sm:text-xl lg:text-2xl font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary hover:opacity-80 transition-opacity cursor-pointer leading-tight whitespace-nowrap"
-                    onClick={() => {
-                      setSelectedCustomerId(null);
-                      setSelectedOpCo(null);
-                      setSelectedBusinessUnit(null);
-                    }}
-                  >
-                    One Cassava Customer 360° View
-                  </h1>
-                  <button
-                    onClick={() => {
-                      setSelectedCustomerId(null);
-                      setSelectedOpCo(null);
-                      setSelectedBusinessUnit(null);
-                    }}
-                    className="text-xs font-medium mt-0.5 hover:opacity-80 transition-opacity inline-block hidden sm:inline-block text-left whitespace-nowrap"
-                    style={{ color: '#00c0ab' }}
-                  >
-                    Intelligence Platform
-                  </button>
-                </div>
-              </div>
-
-              {/* Right side - Search and Actions */}
-              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-8 sm:ml-12 md:ml-16">
-                <OpCoSwitcher
-                  selectedOpCo={selectedOpCo}
-                  onSelectOpCo={setSelectedOpCo}
-                />
-                <BusinessUnitSwitcher
-                  selectedBusinessUnit={selectedBusinessUnit}
-                  onSelectBusinessUnit={setSelectedBusinessUnit}
-                />
-                <div className="w-48 sm:w-56 md:w-72 lg:w-80">
-                  <CustomerSearch
-                    onSelectCustomer={setSelectedCustomerId}
-                    opCoFilter={selectedOpCo}
-                    subsidiaryFilter={selectedBusinessUnit}
-                  />
-                </div>
-                <button
-                  onClick={toggleDarkMode}
-                  className="p-2 rounded-lg bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-secondary hover:bg-datacamp-bg-tertiary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors flex-shrink-0"
-                  aria-label="Toggle dark mode"
-                >
-                  {darkMode ? (
-                    <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-brand" />
-                  ) : (
-                    <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-datacamp-text-subtle" />
-                  )}
-                </button>
-                <span className="hidden sm:inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-datacamp-brand/10 text-datacamp-brand border border-datacamp-brand/20 flex-shrink-0 whitespace-nowrap">
-                  Live
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-
-          {/* Content area with proper spacing */}
-          <div className="relative z-0 pt-3">
-            {selectedCustomerId && (
-              <PersonaDashboard customerId={selectedCustomerId} />
-            )}
-
-            {!selectedCustomerId && selectedBusinessUnit && (
-              <BusinessUnitDashboard
-                subsidiaryId={selectedBusinessUnit}
-                opCoId={selectedOpCo}
-                onSelectCustomer={setSelectedCustomerId}
-              />
-            )}
-
-            {!selectedCustomerId && !selectedBusinessUnit && selectedOpCo && (
-              <OpCoDashboard opCoId={selectedOpCo} onSelectCustomer={setSelectedCustomerId} />
-            )}
-
-            {!selectedCustomerId && !selectedBusinessUnit && !selectedOpCo && (
-              <GroupDashboard onSelectCustomer={setSelectedCustomerId} selectedOpCo={selectedOpCo} />
-            )}
-          </div>
-        </main>
-
-        {/* Drill-down Modal */}
-        {drillDownMetric && (
-          <MetricDrillDown
-            metric={drillDownMetric}
-            filterCriteria={filterCriteria}
-            onClose={() => {
-              setDrillDownMetric(null);
-              setFilterCriteria(null);
-            }}
-          />
-        )}
-
-        {/* Chatbot */}
-        <Chatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
-
-        {/* Chatbot Toggle Button */}
-        {!isChatbotOpen && (
-          <button
-            onClick={() => setIsChatbotOpen(true)}
-            className="fixed bottom-4 right-4 p-4 bg-datacamp-brand hover:bg-datacamp-green/90 text-white rounded-full shadow-lg transition-all hover:scale-110 z-40"
-            aria-label="Open chatbot"
-          >
-            <MessageSquare className="h-6 w-6" />
-          </button>
-        )}
-      </div>
-    </QueryClientProvider>
-  );
-}
-
-export default App;

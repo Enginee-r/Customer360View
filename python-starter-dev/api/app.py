@@ -36,6 +36,43 @@ class DataLoader:
     def __init__(self):
         self.cache = {}
         self.cache_time = {}
+        self.opco_config = None
+        self.region_to_countries = {}
+
+    def _load_opco_config(self):
+        """Load OpCo configuration"""
+        if self.opco_config is None:
+            config_path = BASE_DIR / 'config' / 'opcos.json'
+            with open(config_path, 'r') as f:
+                self.opco_config = json.load(f)
+
+            # Build region to countries mapping
+            for opco in self.opco_config['opcos']:
+                region = opco['region']
+                if region not in self.region_to_countries:
+                    self.region_to_countries[region] = []
+                self.region_to_countries[region].append(opco['id'])
+
+    def _assign_countries(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Assign countries to customers based on their region"""
+        if 'region' not in df.columns or 'country' in df.columns:
+            return df
+
+        self._load_opco_config()
+
+        # Use account_id as seed for consistent country assignment
+        def assign_country(row):
+            region = row['region']
+            if region in self.region_to_countries:
+                countries = self.region_to_countries[region]
+                # Use hash of account_id for consistent assignment
+                seed = hash(row['account_id']) % len(countries)
+                return countries[seed]
+            return None
+
+        df = df.copy()
+        df['country'] = df.apply(assign_country, axis=1)
+        return df
 
     def load_latest(self, table_name: str) -> pd.DataFrame:
         """Load latest version of a gold table"""
@@ -57,6 +94,10 @@ class DataLoader:
 
         df = pd.read_parquet(latest_file)
 
+        # Assign countries to customers for customer_360_metrics
+        if table_name == 'customer_360_metrics':
+            df = self._assign_countries(df)
+
         # Cache it
         self.cache[table_name] = df
         self.cache_time[table_name] = datetime.now()
@@ -65,6 +106,28 @@ class DataLoader:
 
 
 data_loader = DataLoader()
+
+
+def has_zero_metrics(customer: dict) -> bool:
+    """
+    Check if a customer has any KEY BUSINESS METRIC with a zero value.
+    Returns True if customer should be excluded (has zeros), False otherwise.
+    """
+    # Key business metrics that should NOT be zero
+    # These are the critical metrics that indicate a customer has real business value
+    key_metrics = {
+        'annual_revenue',
+        'customer_lifetime_value',
+        'monthly_recurring_revenue',
+    }
+
+    for metric in key_metrics:
+        value = customer.get(metric)
+        if value is not None and isinstance(value, (int, float)):
+            if value == 0 or value == 0.0:
+                return True
+
+    return False
 
 
 @app.route('/api/health', methods=['GET'])
@@ -104,7 +167,59 @@ def search_customers():
             elif pd.isna(value):
                 customer[key] = None
 
-    return jsonify(results)
+    # Filter out customers with any zero-valued metrics
+    filtered_results = [customer for customer in results if not has_zero_metrics(customer)]
+
+    return jsonify(filtered_results)
+
+
+def _calculate_subsidiary_metrics(customers_df):
+    """Calculate average metrics for each subsidiary from all customers who belong to it"""
+    subsidiary_metrics = {}
+
+    for _, customer in customers_df.iterrows():
+        if not customer.get('subsidiaries'):
+            continue
+
+        try:
+            subs = json.loads(customer['subsidiaries']) if isinstance(customer['subsidiaries'], str) else customer['subsidiaries']
+
+            for sub in subs:
+                sub_id = sub.get('subsidiary_id')
+                if not sub_id:
+                    continue
+
+                if sub_id not in subsidiary_metrics:
+                    subsidiary_metrics[sub_id] = {
+                        'nps_scores': [],
+                        'csat_scores': [],
+                        'ces_scores': [],
+                        'clv_values': []
+                    }
+
+                # Collect metrics from this customer for this subsidiary
+                if pd.notna(customer.get('nps_score')):
+                    subsidiary_metrics[sub_id]['nps_scores'].append(float(customer['nps_score']))
+                if pd.notna(customer.get('csat_score')):
+                    subsidiary_metrics[sub_id]['csat_scores'].append(float(customer['csat_score']))
+                if pd.notna(customer.get('ces_score')):
+                    subsidiary_metrics[sub_id]['ces_scores'].append(float(customer['ces_score']))
+                if pd.notna(customer.get('customer_lifetime_value')):
+                    subsidiary_metrics[sub_id]['clv_values'].append(float(customer['customer_lifetime_value']))
+        except:
+            continue
+
+    # Calculate averages for each subsidiary
+    result = {}
+    for sub_id, metrics in subsidiary_metrics.items():
+        result[sub_id] = {
+            'nps_score': np.mean(metrics['nps_scores']) if metrics['nps_scores'] else None,
+            'csat_score': np.mean(metrics['csat_scores']) if metrics['csat_scores'] else None,
+            'ces_score': np.mean(metrics['ces_scores']) if metrics['ces_scores'] else None,
+            'customer_lifetime_value': np.mean(metrics['clv_values']) if metrics['clv_values'] else None
+        }
+
+    return result
 
 
 @app.route('/api/customer/<account_id>', methods=['GET'])
@@ -122,12 +237,64 @@ def get_customer_360(account_id: str):
 
     customer_data = customer.iloc[0].to_dict()
 
-    # Clean up NaN values and convert timestamps
+    # Calculate subsidiary-level metrics
+    subsidiary_metrics = _calculate_subsidiary_metrics(customers)
+
+    # Get customer's subsidiaries and calculate average metrics
+    if customer_data.get('subsidiaries'):
+        try:
+            subs = json.loads(customer_data['subsidiaries']) if isinstance(customer_data['subsidiaries'], str) else customer_data['subsidiaries']
+
+            nps_values = []
+            csat_values = []
+            ces_values = []
+            clv_values = []
+
+            # Add subsidiary-specific metrics to each subsidiary object
+            for sub in subs:
+                sub_id = sub.get('subsidiary_id')
+                if sub_id and sub_id in subsidiary_metrics:
+                    sub_metrics = subsidiary_metrics[sub_id]
+                    # Add metrics to the subsidiary object (rounded to 2 decimal places)
+                    sub['nps_score'] = round(sub_metrics['nps_score'], 2) if sub_metrics['nps_score'] is not None else None
+                    sub['csat_score'] = round(sub_metrics['csat_score'], 2) if sub_metrics['csat_score'] is not None else None
+                    sub['ces_score'] = round(sub_metrics['ces_score'], 2) if sub_metrics['ces_score'] is not None else None
+                    sub['clv'] = round(sub_metrics['customer_lifetime_value'], 2) if sub_metrics['customer_lifetime_value'] is not None else None
+
+                    # Collect values for averaging
+                    if sub_metrics['nps_score'] is not None:
+                        nps_values.append(sub_metrics['nps_score'])
+                    if sub_metrics['csat_score'] is not None:
+                        csat_values.append(sub_metrics['csat_score'])
+                    if sub_metrics['ces_score'] is not None:
+                        ces_values.append(sub_metrics['ces_score'])
+                    if sub_metrics['customer_lifetime_value'] is not None:
+                        clv_values.append(sub_metrics['customer_lifetime_value'])
+
+            # Override customer metrics with subsidiary averages (rounded to 2 decimal places)
+            customer_data['nps_score'] = round(float(np.mean(nps_values)), 2) if nps_values else customer_data.get('nps_score')
+            customer_data['csat_score'] = round(float(np.mean(csat_values)), 2) if csat_values else customer_data.get('csat_score')
+            customer_data['ces_score'] = round(float(np.mean(ces_values)), 2) if ces_values else customer_data.get('ces_score')
+            customer_data['customer_lifetime_value'] = round(float(np.mean(clv_values)), 2) if clv_values else customer_data.get('customer_lifetime_value')
+
+            # Update the subsidiaries field with the enriched data
+            customer_data['subsidiaries'] = subs
+        except Exception as e:
+            logger.warning(f"Error calculating subsidiary averages for customer {account_id}: {e}")
+
+    # Clean up NaN values, round numeric values, and convert timestamps
     for key, value in list(customer_data.items()):
+        # Skip lists (like subsidiaries)
+        if isinstance(value, list):
+            continue
         if pd.api.types.is_datetime64_any_dtype(type(value)) or isinstance(value, (pd.Timestamp, datetime)):
             customer_data[key] = value.isoformat() if not pd.isna(value) else None
         elif isinstance(value, (np.integer, np.floating)):
-            customer_data[key] = None if pd.isna(value) else float(value)
+            if pd.isna(value):
+                customer_data[key] = None
+            else:
+                # Round all numeric values to 2 decimal places
+                customer_data[key] = round(float(value), 2)
         elif pd.isna(value):
             customer_data[key] = None
 
@@ -328,6 +495,47 @@ def get_dashboard_summary():
     if customers.empty:
         return jsonify({})
 
+    # Filter by OpCo if provided
+    opco_filter = request.args.get('opco')
+    if opco_filter:
+        # Get OpCo configuration to find the data_region
+        config_path = Path(__file__).parent.parent / 'config' / 'opcos.json'
+        with open(config_path, 'r') as f:
+            opco_config = json.load(f)
+
+        # Find the matching OpCo
+        opco = next((o for o in opco_config['opcos'] if o['id'] == opco_filter), None)
+        if opco:
+            # Filter customers by exact region match
+            data_region = opco.get('data_region', opco['region'])
+            customers = customers[customers['region'] == data_region]
+        else:
+            # If OpCo not found, return empty results
+            customers = customers[customers['region'] == 'NONEXISTENT']
+
+        if customers.empty:
+            return jsonify({
+                'total_customers': 0,
+                'total_revenue': 0,
+                'avg_health_score': 0,
+                'high_risk_customers': 0,
+                'health_distribution': {},
+                'risk_distribution': {},
+                'region_distribution': {},
+                'top_revenue_customers': [],
+                'at_risk_customers': [],
+                'healthy_customers_sample': [],
+                'at_risk_customers_sample': [],
+                'critical_customers_sample': [],
+                'region_samples': {},
+                'avg_nps': 0,
+                'avg_csat': 0,
+                'avg_ces': 0,
+                'avg_support_tickets': 0,
+                'avg_sla_compliance': 0,
+                'avg_revenue_per_customer': 0
+            })
+
     # Helper function to add subsidiary info to customer records
     def add_subsidiary_info(customer_df):
         results = []
@@ -335,10 +543,10 @@ def get_dashboard_summary():
             customer_data = {
                 'account_id': customer['account_id'],
                 'account_name': customer['account_name'],
-                'annual_revenue': float(customer.get('annual_revenue', 0)),
+                'annual_revenue': float(customer.get('annual_revenue', 0)) if pd.notna(customer.get('annual_revenue')) else None,
                 'health_status': customer.get('health_status'),
                 'region': customer.get('region'),
-                'churn_risk_score': float(customer.get('churn_risk_score', 0)),
+                'churn_risk_score': float(customer.get('churn_risk_score', 0)) if pd.notna(customer.get('churn_risk_score')) else None,
                 'subsidiaries': []
             }
 
@@ -351,7 +559,9 @@ def get_dashboard_summary():
                 except:
                     pass
 
-            results.append(customer_data)
+            # Only include customer if they don't have zero-valued metrics
+            if not has_zero_metrics(customer_data):
+                results.append(customer_data)
         return results
 
     # Get customers by health status
@@ -753,14 +963,17 @@ def get_subsidiary_customers(subsidiary_id: str):
                 subs = json.loads(subs_field) if isinstance(subs_field, str) else subs_field
                 # Check if this subsidiary is in the customer's subsidiaries
                 if any(sub['subsidiary_id'] == subsidiary_id for sub in subs):
-                    filtered_customers.append({
+                    customer_data = {
                         'account_id': customer['account_id'],
                         'account_name': customer['account_name'],
                         'region': customer['region'],
                         'health_status': customer['health_status'],
-                        'annual_revenue': customer.get('annual_revenue', 0),
+                        'annual_revenue': float(customer.get('annual_revenue', 0)) if pd.notna(customer.get('annual_revenue')) else None,
                         'primary_subsidiary': customer.get('primary_subsidiary')
-                    })
+                    }
+                    # Only include customer if they don't have zero-valued metrics
+                    if not has_zero_metrics(customer_data):
+                        filtered_customers.append(customer_data)
             except Exception as e:
                 logger.warning(f"Error parsing subsidiaries for customer {customer.get('account_id')}: {e}")
                 continue
@@ -802,6 +1015,184 @@ def get_subsidiary_stats(subsidiary_id: str):
     })
 
 
+@app.route('/api/opcos', methods=['GET'])
+def get_opcos():
+    """Get list of all operational countries"""
+    import json
+    from pathlib import Path
+
+    config_path = Path(__file__).parent.parent / 'config' / 'opcos.json'
+    with open(config_path, 'r') as f:
+        opco_config = json.load(f)
+
+    return jsonify(opco_config)
+
+
+@app.route('/api/opco/<opco_id>/stats', methods=['GET'])
+def get_opco_stats(opco_id: str):
+    """Get statistics for a specific operational country"""
+    customers = data_loader.load_latest('customer_360_metrics')
+
+    if customers.empty:
+        return jsonify({})
+
+    # Filter customers by country
+    opco_customers = customers[customers['country'] == opco_id]
+
+    total_customers = len(opco_customers)
+    total_revenue = opco_customers['annual_revenue'].sum() if 'annual_revenue' in opco_customers else 0
+
+    return jsonify({
+        'opco_id': opco_id,
+        'total_customers': int(total_customers),
+        'total_revenue': float(total_revenue) if pd.notna(total_revenue) else 0,
+        'avg_revenue_per_customer': float(total_revenue / total_customers) if total_customers > 0 else 0
+    })
+
+
+@app.route('/api/opco/<opco_id>/customers', methods=['GET'])
+def get_opco_customers(opco_id: str):
+    """Get all customers for a specific operational country"""
+    customers = data_loader.load_latest('customer_360_metrics')
+
+    if customers.empty:
+        return jsonify([])
+
+    # Filter customers by country
+    opco_customers = customers[customers['country'] == opco_id]
+
+    # Convert to list of customer objects
+    customers_list = []
+    for _, customer in opco_customers.iterrows():
+        customer_data = {
+            'account_id': customer['account_id'],
+            'account_name': customer['account_name'],
+            'region': customer['region'],
+            'health_status': customer['health_status'],
+            'annual_revenue': float(customer.get('annual_revenue', 0)) if pd.notna(customer.get('annual_revenue')) else None,
+        }
+        customers_list.append(customer_data)
+
+    return jsonify(customers_list)
+
+
+@app.route('/api/opco/<opco_id>/dashboard', methods=['GET'])
+def get_opco_dashboard(opco_id: str):
+    """Get comprehensive dashboard metrics for a specific operational country"""
+    customers = data_loader.load_latest('customer_360_metrics')
+
+    if customers.empty:
+        return jsonify({})
+
+    # Filter customers by country
+    opco_customers = customers[customers['country'] == opco_id]
+
+    if opco_customers.empty:
+        return jsonify({
+            'opco_id': opco_id,
+            'total_customers': 0,
+            'total_revenue': 0,
+            'avg_health_score': 0,
+            'high_risk_customers': 0,
+            'health_distribution': {},
+            'risk_distribution': {},
+            'region_distribution': {},
+            'top_revenue_customers': [],
+            'at_risk_customers_sample': [],
+            'healthy_customers_sample': [],
+            'critical_customers_sample': [],
+            'region_samples': {},
+            'avg_nps': 0,
+            'avg_csat': 0,
+            'avg_ces': 0,
+            'avg_support_tickets': 0,
+            'avg_sla_compliance': 0,
+            'avg_revenue_per_customer': 0
+        })
+
+    # Helper function to add subsidiary info to customer records
+    def add_subsidiary_info(customer_df):
+        results = []
+        for _, customer in customer_df.iterrows():
+            customer_data = {
+                'account_id': customer['account_id'],
+                'account_name': customer['account_name'],
+                'annual_revenue': float(customer.get('annual_revenue', 0)) if pd.notna(customer.get('annual_revenue')) else None,
+                'health_status': customer.get('health_status'),
+                'region': customer.get('region'),
+                'churn_risk_score': float(customer.get('churn_risk_score', 0)) if pd.notna(customer.get('churn_risk_score')) else None,
+                'subsidiaries': []
+            }
+
+            # Parse and add subsidiary information
+            if customer.get('subsidiaries'):
+                try:
+                    subs = json.loads(customer['subsidiaries']) if isinstance(customer['subsidiaries'], str) else customer['subsidiaries']
+                    customer_data['subsidiaries'] = subs
+                    customer_data['subsidiary_count'] = len(subs)
+                except:
+                    pass
+
+            results.append(customer_data)
+        return results
+
+    # Get customers by health status
+    healthy_customers = add_subsidiary_info(
+        opco_customers[opco_customers['health_status'] == 'Healthy'].head(10)
+    )
+    at_risk_customers_health = add_subsidiary_info(
+        opco_customers[opco_customers['health_status'] == 'At-Risk'].head(10)
+    )
+    critical_customers = add_subsidiary_info(
+        opco_customers[opco_customers['health_status'] == 'Critical'].head(10)
+    )
+
+    # Get customers by region
+    region_samples = {}
+    for region in opco_customers['region'].unique():
+        region_customers = opco_customers[opco_customers['region'] == region].head(5)
+        region_samples[region] = add_subsidiary_info(region_customers)
+
+    # Customer satisfaction metrics
+    avg_nps = float(opco_customers['nps_score'].mean()) if 'nps_score' in opco_customers.columns else 0
+    avg_csat = float(opco_customers['csat_score'].mean()) if 'csat_score' in opco_customers.columns else 0
+    avg_ces = float(opco_customers['ces_score'].mean()) if 'ces_score' in opco_customers.columns else 0
+
+    # Service metrics
+    avg_support_tickets = float(opco_customers['support_tickets_open'].mean()) if 'support_tickets_open' in opco_customers.columns else 0
+    avg_sla_compliance = float(opco_customers['sla_compliance_rate'].mean()) if 'sla_compliance_rate' in opco_customers.columns else 0
+    total_revenue = float(opco_customers['annual_revenue'].sum())
+    total_customers_count = len(opco_customers)
+
+    summary = {
+        'opco_id': opco_id,
+        'total_customers': total_customers_count,
+        'total_revenue': total_revenue,
+        'avg_health_score': float(opco_customers['health_score'].mean()),
+        'high_risk_customers': len(opco_customers[opco_customers['churn_risk_level'] == 'HIGH']),
+        'health_distribution': opco_customers['health_status'].value_counts().to_dict(),
+        'risk_distribution': opco_customers['churn_risk_level'].value_counts().to_dict(),
+        'region_distribution': opco_customers['region'].value_counts().to_dict(),
+        'top_revenue_customers': add_subsidiary_info(
+            opco_customers.nlargest(10, 'annual_revenue')
+        ),
+        'at_risk_customers_sample': at_risk_customers_health,
+        'healthy_customers_sample': healthy_customers,
+        'critical_customers_sample': critical_customers,
+        'region_samples': region_samples,
+        # Customer satisfaction metrics
+        'avg_nps': avg_nps,
+        'avg_csat': avg_csat,
+        'avg_ces': avg_ces,
+        # Service metrics
+        'avg_support_tickets': avg_support_tickets,
+        'avg_sla_compliance': avg_sla_compliance,
+        'avg_revenue_per_customer': float(total_revenue / total_customers_count) if total_customers_count > 0 else 0
+    }
+
+    return jsonify(summary)
+
+
 @app.route('/api/subsidiary/<subsidiary_id>/dashboard', methods=['GET'])
 def get_subsidiary_dashboard(subsidiary_id: str):
     """Get comprehensive dashboard metrics for a specific subsidiary"""
@@ -809,6 +1200,24 @@ def get_subsidiary_dashboard(subsidiary_id: str):
 
     if customers.empty:
         return jsonify({})
+
+    # Filter by OpCo if provided
+    opco_filter = request.args.get('opco')
+    if opco_filter:
+        # Get OpCo configuration to find the data_region
+        config_path = Path(__file__).parent.parent / 'config' / 'opcos.json'
+        with open(config_path, 'r') as f:
+            opco_config = json.load(f)
+
+        # Find the matching OpCo
+        opco = next((o for o in opco_config['opcos'] if o['id'] == opco_filter), None)
+        if opco:
+            # Filter customers by exact region match
+            data_region = opco.get('data_region', opco['region'])
+            customers = customers[customers['region'] == data_region]
+        else:
+            # If OpCo not found, return empty results
+            customers = customers[customers['region'] == 'NONEXISTENT']
 
     # Filter customers who have relationship with this subsidiary
     subsidiary_customers = []
@@ -859,27 +1268,33 @@ def get_subsidiary_dashboard(subsidiary_id: str):
     # Top revenue customers (by subsidiary-specific revenue)
     top_customers = []
     for _, customer in sub_df.iterrows():
-        top_customers.append({
+        customer_data = {
             'account_id': customer['account_id'],
             'account_name': customer['account_name'],
             'annual_revenue': subsidiary_revenues.get(customer['account_id'], 0),
             'health_status': customer['health_status'],
             'region': customer['region']
-        })
-    top_customers = sorted(top_customers, key=lambda x: x['annual_revenue'], reverse=True)[:10]
+        }
+        # Only include customer if they don't have zero-valued metrics
+        if not has_zero_metrics(customer_data):
+            top_customers.append(customer_data)
+    top_customers = sorted(top_customers, key=lambda x: x.get('annual_revenue', 0), reverse=True)[:10]
 
     # At-risk customers
     at_risk_df = sub_df[sub_df['churn_risk_level'] == 'HIGH']
     at_risk_customers = []
     for _, customer in at_risk_df.iterrows():
-        at_risk_customers.append({
+        customer_data = {
             'account_id': customer['account_id'],
             'account_name': customer['account_name'],
             'churn_risk_score': float(customer['churn_risk_score']),
             'annual_revenue': subsidiary_revenues.get(customer['account_id'], 0),
             'health_status': customer['health_status']
-        })
-    at_risk_customers = sorted(at_risk_customers, key=lambda x: x['churn_risk_score'], reverse=True)[:10]
+        }
+        # Only include customer if they don't have zero-valued metrics
+        if not has_zero_metrics(customer_data):
+            at_risk_customers.append(customer_data)
+    at_risk_customers = sorted(at_risk_customers, key=lambda x: x.get('churn_risk_score', 0), reverse=True)[:10]
 
     # Customer satisfaction metrics
     avg_nps = float(sub_df['nps_score'].mean()) if 'nps_score' in sub_df.columns else 0

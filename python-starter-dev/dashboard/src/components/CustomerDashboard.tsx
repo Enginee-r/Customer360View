@@ -133,14 +133,89 @@ export default function CustomerDashboard({ customerId }: CustomerDashboardProps
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* Key Metrics (Group Level - Averaged across Business Units) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          title="NPS Score"
+          value={customer.nps_score?.toFixed(2) || '0'}
+          icon={Users}
+          trend={null}
+        />
+        <MetricCard
+          title="CSAT Score"
+          value={customer.csat_score?.toFixed(2) || '0'}
+          icon={CheckCircle}
+          trend={null}
+        />
+        <MetricCard
+          title="CES Score"
+          value={customer.ces_score?.toFixed(2) || '0'}
+          icon={Activity}
+          trend={null}
+        />
         <MetricCard
           title="Customer Lifetime Value"
           value={formatCurrency(customer.customer_lifetime_value || 0)}
           icon={DollarSign}
           trend={null}
         />
+      </div>
+
+      {/* Business Unit Relationships */}
+      {customer.subsidiaries && customer.subsidiaries.length > 0 && (
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Business Unit Relationships</h3>
+          <div className="space-y-4">
+            {customer.subsidiaries.map((subsidiary: any) => (
+              <div
+                key={subsidiary.subsidiary_id}
+                className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{subsidiary.subsidiary_name}</h4>
+                    <p className="text-sm text-gray-500">
+                      {subsidiary.service_count} services
+                      {subsidiary.primary && <span className="ml-2 text-blue-600 font-medium">(Primary)</span>}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Subsidiary-specific metrics */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3 pt-3 border-t border-gray-100">
+                  <div>
+                    <p className="text-xs text-gray-500">NPS Score</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {subsidiary.nps_score?.toFixed(2) || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">CSAT Score</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {subsidiary.csat_score?.toFixed(2) || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">CES Score</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {subsidiary.ces_score?.toFixed(2) || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">CLV</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {subsidiary.clv ? formatCurrency(subsidiary.clv) : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Additional Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Monthly Recurring Revenue"
           value={formatCurrency(customer.monthly_recurring_revenue || 0)}

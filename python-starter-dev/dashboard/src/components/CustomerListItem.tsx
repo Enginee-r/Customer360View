@@ -24,21 +24,21 @@ interface CustomerListItemProps {
   showRevenue?: boolean;
 }
 
-interface SubsidiaryConfig {
+interface BusinessUnitConfig {
   id: string;
   color: string;
   short_name: string;
 }
 
 export default function CustomerListItem({ customer, onClick, showRevenue = false }: CustomerListItemProps) {
-  const [subsidiaryConfig, setSubsidiaryConfig] = useState<Record<string, SubsidiaryConfig>>({});
+  const [businessUnitConfig, setBusinessUnitConfig] = useState<Record<string, BusinessUnitConfig>>({});
 
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
     fetch(`${apiUrl}/subsidiaries`)
       .then(res => res.json())
       .then(data => {
-        const config: Record<string, SubsidiaryConfig> = {};
+        const config: Record<string, BusinessUnitConfig> = {};
         if (data.subsidiaries) {
           data.subsidiaries.forEach((sub: any) => {
             config[sub.id] = {
@@ -48,9 +48,9 @@ export default function CustomerListItem({ customer, onClick, showRevenue = fals
             };
           });
         }
-        setSubsidiaryConfig(config);
+        setBusinessUnitConfig(config);
       })
-      .catch(err => console.error('Error fetching subsidiary config:', err));
+      .catch(err => console.error('Error fetching business unit config:', err));
   }, []);
 
   const formatCurrency = (value: number) => {
@@ -82,7 +82,7 @@ export default function CustomerListItem({ customer, onClick, showRevenue = fals
               <span className="text-xs text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle">•</span>
               <div className="flex items-center gap-1 flex-wrap">
                 {customer.subsidiaries.map((sub, idx) => {
-                  const config = subsidiaryConfig[sub.subsidiary_id];
+                  const config = businessUnitConfig[sub.subsidiary_id];
                   return (
                     <div
                       key={idx}
