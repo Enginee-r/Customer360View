@@ -224,7 +224,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, onReset }) =>
   if (!isOpen) return null;
 
   return (
-    <div ref={chatbotRef} className="fixed bottom-4 right-4 w-96 h-[600px] bg-white dark:bg-datacamp-dark-bg-contrast rounded-lg shadow-2xl flex flex-col z-50 border border-gray-200 dark:border-datacamp-dark-bg-secondary">
+    <div ref={chatbotRef} className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 h-[600px] max-h-[80vh] bg-white dark:bg-datacamp-dark-bg-contrast rounded-lg shadow-2xl flex flex-col z-50 border border-gray-200 dark:border-datacamp-dark-bg-secondary">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-datacamp-dark-bg-secondary bg-gradient-to-r from-datacamp-brand/10 to-datacamp-blue/10 dark:from-datacamp-brand/20 dark:to-datacamp-blue/20 rounded-t-lg">
         <div className="flex items-center gap-2">
