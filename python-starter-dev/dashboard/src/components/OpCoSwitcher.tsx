@@ -188,17 +188,19 @@ export default function OpCoSwitcher({ selectedOpCo, onSelectOpCo }: OpCoSwitche
   );
 
   return (
-    <div className="relative">
+    <div className="relative flex-1">
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-secondary hover:bg-datacamp-bg-tertiary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary"
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-secondary hover:bg-datacamp-bg-tertiary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary"
       >
-        <Globe className="h-4 w-4 text-datacamp-brand" />
-        <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary whitespace-nowrap">
-          {currentOpCo ? currentOpCo.name : 'All OpCos'}
-        </span>
-        <ChevronDown className="h-4 w-4 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle" />
+        <div className="flex items-center gap-2 min-w-0">
+          <Globe className="h-4 w-4 text-datacamp-brand flex-shrink-0" />
+          <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary truncate">
+            {currentOpCo ? currentOpCo.name : 'All OpCos'}
+          </span>
+        </div>
+        <ChevronDown className="h-4 w-4 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle flex-shrink-0" />
       </button>
 
       {dropdownContent}

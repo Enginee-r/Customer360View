@@ -164,21 +164,23 @@ export default function BusinessUnitSwitcher({ selectedBusinessUnit, onSelectBus
   );
 
   return (
-    <div className="relative">
+    <div className="relative flex-1">
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-secondary hover:bg-datacamp-bg-tertiary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary"
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-datacamp-bg-secondary dark:bg-datacamp-dark-bg-secondary hover:bg-datacamp-bg-tertiary dark:hover:bg-datacamp-dark-bg-tertiary transition-colors border border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary"
         style={currentBusinessUnit ? { borderColor: currentBusinessUnit.color + '40' } : {}}
       >
-        <Building2
-          className="h-4 w-4"
-          style={currentBusinessUnit ? { color: currentBusinessUnit.color } : {}}
-        />
-        <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary whitespace-nowrap">
-          {currentBusinessUnit ? currentBusinessUnit.short_name : 'All Business Units'}
-        </span>
-        <ChevronDown className="h-4 w-4 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle" />
+        <div className="flex items-center gap-2 min-w-0">
+          <Building2
+            className="h-4 w-4 flex-shrink-0"
+            style={currentBusinessUnit ? { color: currentBusinessUnit.color } : {}}
+          />
+          <span className="text-sm font-medium text-datacamp-text-primary dark:text-datacamp-dark-text-primary truncate">
+            {currentBusinessUnit ? currentBusinessUnit.short_name : 'All Business Units'}
+          </span>
+        </div>
+        <ChevronDown className="h-4 w-4 text-datacamp-text-subtle dark:text-datacamp-dark-text-subtle flex-shrink-0" />
       </button>
 
       {dropdownContent}

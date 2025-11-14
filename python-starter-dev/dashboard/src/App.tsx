@@ -631,14 +631,14 @@ function App() {
                     />
                   </a>
                   <h1
-                    className="text-sm font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary cursor-pointer"
+                    className="text-xs font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary cursor-pointer leading-tight"
                     onClick={() => {
                       setSelectedCustomerId(null);
                       setSelectedOpCo(null);
                       setSelectedBusinessUnit(null);
                     }}
                   >
-                    Customer 360°
+                    One Cassava Customer 360° View
                   </h1>
                 </div>
                 <div className="flex items-center gap-2">
@@ -659,7 +659,7 @@ function App() {
                 </div>
               </div>
               {/* Second row - Filters */}
-              <div className="flex items-center gap-1.5 mb-2">
+              <div className="flex items-center gap-2 mb-2">
                 <OpCoSwitcher
                   selectedOpCo={selectedOpCo}
                   onSelectOpCo={setSelectedOpCo}
@@ -802,10 +802,11 @@ function App() {
         {!isChatbotOpen && (
           <button
             onClick={() => setIsChatbotOpen(true)}
-            className="fixed bottom-4 right-4 p-4 bg-datacamp-brand hover:bg-datacamp-green/90 text-white rounded-full shadow-lg transition-all hover:scale-110 z-40"
+            className="fixed bottom-4 right-4 p-3 sm:p-4 bg-datacamp-brand hover:bg-datacamp-green/90 text-white rounded-full shadow-lg transition-all hover:scale-110 z-[60]"
             aria-label="Open chatbot"
+            style={{ position: 'fixed' }}
           >
-            <MessageSquare className="h-6 w-6" />
+            <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
         )}
       </div>
