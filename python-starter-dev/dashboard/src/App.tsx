@@ -548,7 +548,7 @@ function App() {
   const [selectedBusinessUnit, setSelectedBusinessUnit] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
+    return saved ? JSON.parse(saved) : true;
   });
   const [drillDownMetric, setDrillDownMetric] = useState<'customers' | 'revenue' | 'health' | 'at-risk' | null>(null);
   const [filterCriteria, setFilterCriteria] = useState<{ type: 'health' | 'region', value: string } | null>(null);
@@ -631,14 +631,14 @@ function App() {
                     />
                   </a>
                   <h1
-                    className="text-xs font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary cursor-pointer leading-tight"
+                    className="text-xs font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary cursor-pointer leading-tight whitespace-nowrap"
                     onClick={() => {
                       setSelectedCustomerId(null);
                       setSelectedOpCo(null);
                       setSelectedBusinessUnit(null);
                     }}
                   >
-                    One Cassava Customer 360° View
+                    One Cassava Customer 360°
                   </h1>
                 </div>
                 <div className="flex items-center gap-2">
