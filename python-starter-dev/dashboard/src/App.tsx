@@ -631,7 +631,7 @@ function App() {
                     />
                   </a>
                   <h1
-                    className="text-xs font-bold text-datacamp-text-primary dark:text-datacamp-dark-text-primary cursor-pointer leading-tight whitespace-nowrap"
+                    className="text-sm font-extrabold text-datacamp-text-primary dark:text-datacamp-dark-text-primary cursor-pointer leading-tight whitespace-nowrap"
                     onClick={() => {
                       setSelectedCustomerId(null);
                       setSelectedOpCo(null);
