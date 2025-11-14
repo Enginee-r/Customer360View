@@ -610,7 +610,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-datacamp-bg-main dark:bg-datacamp-dark-bg-main transition-colors">
-        <header className="shadow-sm border-b border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-main">
+        <header className="sticky top-0 z-50 shadow-sm border-b border-datacamp-bg-tertiary dark:border-datacamp-dark-bg-tertiary bg-datacamp-bg-contrast dark:bg-datacamp-dark-bg-main">
           <div className="mx-auto px-2 py-2 sm:px-6 lg:px-8">
             {/* Mobile Layout */}
             <div className="md:hidden">
@@ -658,8 +658,8 @@ function App() {
                   </button>
                 </div>
               </div>
-              {/* Second row - Filters and Search */}
-              <div className="flex items-center gap-1.5">
+              {/* Second row - Filters */}
+              <div className="flex items-center gap-1.5 mb-2">
                 <OpCoSwitcher
                   selectedOpCo={selectedOpCo}
                   onSelectOpCo={setSelectedOpCo}
@@ -668,13 +668,14 @@ function App() {
                   selectedBusinessUnit={selectedBusinessUnit}
                   onSelectBusinessUnit={setSelectedBusinessUnit}
                 />
-                <div className="flex-1 min-w-0">
-                  <CustomerSearch
-                    onSelectCustomer={setSelectedCustomerId}
-                    opCoFilter={selectedOpCo}
-                    subsidiaryFilter={selectedBusinessUnit}
-                  />
-                </div>
+              </div>
+              {/* Third row - Search */}
+              <div>
+                <CustomerSearch
+                  onSelectCustomer={setSelectedCustomerId}
+                  opCoFilter={selectedOpCo}
+                  subsidiaryFilter={selectedBusinessUnit}
+                />
               </div>
             </div>
 
